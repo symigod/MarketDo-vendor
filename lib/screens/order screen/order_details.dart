@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/src/widgets/framework.dart';
 
 class OrderDetails extends StatelessWidget {
   const OrderDetails({Key? key}) : super(key: key);
@@ -24,11 +23,11 @@ class OrderDetails extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('Customer Information'),
-                  Text('Miraluna Lariosa'),
-                  Text('09454336652'),
-                  Text('Apagan 1, Nasipit, Agusan del Norte'),
-                   Text('Near seawall, black gate'),
+                  const Text('Customer Information'),
+                  const Text('Miraluna Lariosa'),
+                  const Text('09454336652'),
+                  const Text('Apagan 1, Nasipit, Agusan del Norte'),
+                   const Text('Near seawall, black gate'),
                 ListView.builder(
                     shrinkWrap: true,
                     itemCount: 3, // Replace with the desired number of dummy items
@@ -46,11 +45,11 @@ class OrderDetails extends StatelessWidget {
                     },
                   ),
 
-                Text('PAYMENT METHOD:'),
-                Text('SHIPPING METHOD: '),
-                Text('TOTAL PRICE: '),
-                Text('SHIPPING FEE:'),
-                Text('TOTAL AMOUNT:'),
+                const Text('PAYMENT METHOD:'),
+                const Text('SHIPPING METHOD: '),
+                const Text('TOTAL PRICE: '),
+                const Text('SHIPPING FEE:'),
+                const Text('TOTAL AMOUNT:'),
 
                 ],
               ),

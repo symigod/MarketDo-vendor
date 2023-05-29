@@ -1,8 +1,5 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/src/widgets/framework.dart';
-import 'package:flutter/src/widgets/placeholder.dart';
-import 'package:marketdo_app_vendor/provider/product_provider.dart';
 import '../../firebase_services.dart';
 import '../../model/product_model.dart';
 
@@ -108,6 +105,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
         if(value!.isEmpty){
           return 'enter $label';
         }
+        return null;
       },
     );
   }
@@ -306,7 +304,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Text('Size List', style: TextStyle(fontWeight: FontWeight.bold),),
+                            const Text('Size List', style: TextStyle(fontWeight: FontWeight.bold),),
                             if(_editable == false)
                             TextButton(
                               child: const Text('Add List'),
@@ -328,6 +326,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                                     if(value!.isEmpty){
                                       return 'Enter a value';
                                     }
+                                    return null;
                                   },
                                 controller: _sizeText,
                                 decoration: const InputDecoration(

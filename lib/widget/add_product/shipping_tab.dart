@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/src/widgets/framework.dart';
-import 'package:flutter/src/widgets/placeholder.dart';
 import 'package:marketdo_app_vendor/firebase_services.dart';
 import 'package:marketdo_app_vendor/provider/product_provider.dart';
 import 'package:provider/provider.dart';
@@ -17,7 +15,7 @@ class _ShippingTabState extends State<ShippingTab> with AutomaticKeepAliveClient
   bool get wantKeepAlive=> true;
 
 bool? _chargeShipping = false;
-FirebaseServices _services = FirebaseServices();
+final FirebaseServices _services = FirebaseServices();
 
   @override
   Widget build(BuildContext context) {
@@ -30,7 +28,7 @@ FirebaseServices _services = FirebaseServices();
               children: [
           CheckboxListTile(
             contentPadding: EdgeInsets.zero,
-            title: Text('Charge Transport fee? ', style: TextStyle(color: Colors.grey),),
+            title: const Text('Charge Transport fee? ', style: TextStyle(color: Colors.grey),),
             value: _chargeShipping, 
           onChanged: (value){
             setState(() {

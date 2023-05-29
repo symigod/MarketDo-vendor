@@ -1,9 +1,6 @@
-import 'dart:ffi';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/src/widgets/framework.dart';
-import 'package:flutter/src/widgets/placeholder.dart';
 import 'package:marketdo_app_vendor/provider/product_provider.dart';
 import 'package:provider/provider.dart';
 
@@ -26,7 +23,7 @@ class _GeneralTabState extends State<GeneralTab> with AutomaticKeepAliveClientMi
   final List <String> _categories = [];
   String? selectedCategory;
 
-  bool _salesPrice = false;
+  final bool _salesPrice = false;
   
 
   Widget _categoryDropDown(ProductProvider provider){
@@ -55,6 +52,7 @@ class _GeneralTabState extends State<GeneralTab> with AutomaticKeepAliveClientMi
                if(value!.isEmpty){
                 return 'Select Category';
                }
+               return null;
               },
     );
   }
@@ -70,11 +68,11 @@ class _GeneralTabState extends State<GeneralTab> with AutomaticKeepAliveClientMi
 
   getCategories(){
     _services.categories.get().then((value) {
-      value.docs.forEach((element) {
+      for (var element in value.docs) {
         setState(() {
           _categories.add(element['catName']);
         });
-      });
+      }
     });
   }
 
@@ -181,16 +179,16 @@ class MainCategoryList extends StatefulWidget {
 class _MainCategoryListState extends State<MainCategoryList> {
   @override
   Widget build(BuildContext context) {
-    FirebaseServices _service = FirebaseServices();
+    FirebaseServices service = FirebaseServices();
     return Dialog(
       child: FutureBuilder<QuerySnapshot>(
-        future: _service.mainCategories.where('category', isEqualTo: widget.selectedCategory).get(),
+        future: service.mainCategories.where('category', isEqualTo: widget.selectedCategory).get(),
         builder: (context, snapshot){
           if(snapshot.connectionState==ConnectionState.waiting){
-            return Center(child: CircularProgressIndicator(),);
+            return const Center(child: CircularProgressIndicator(),);
           }
           if (snapshot.data!.size==0) {
-            return Center(child: Text('No Main Categories'),);
+            return const Center(child: Text('No Main Categories'),);
           }
           return ListView.builder(
             itemCount: snapshot.data!.size,

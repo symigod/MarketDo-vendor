@@ -16,38 +16,29 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
   Provider.debugCheckInvalidValueType = null;
-  runApp(
-    MultiProvider(
-      providers: [
-        Provider<VendorProvider>(create: (_) => VendorProvider()),
-        Provider<ProductProvider>(create: (_) => ProductProvider()),
-      ],
-      child: const MyApp(),
-    ),
-  );
+  runApp(MultiProvider(providers: [
+    Provider<VendorProvider>(create: (_) => VendorProvider()),
+    Provider<ProductProvider>(create: (_) => ProductProvider())
+  ], child: const MyApp()));
 }
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        primarySwatch: Colors.green,
-      ),
-      home: const SplashScreen(),
-      builder: EasyLoading.init(),
-      routes: {
-        LoginScreen.id: (context) => const LoginScreen(),
-        HomeScreen.id: (context) => const HomeScreen(),
-        ProductScreen.id: (context) => const ProductScreen(),
-        AddProductScreen.id: (context) => const AddProductScreen(),
-        OrderScreen.id: (context) => OrderScreen(),
-      },
-    );
+        debugShowCheckedModeBanner: false,
+        theme: ThemeData(primarySwatch: Colors.green),
+        home: const SplashScreen(),
+        builder: EasyLoading.init(),
+        routes: {
+          LoginScreen.id: (context) => const LoginScreen(),
+          HomeScreen.id: (context) => const HomeScreen(),
+          ProductScreen.id: (context) => const ProductScreen(),
+          AddProductScreen.id: (context) => const AddProductScreen(),
+          OrderScreen.id: (context) => const OrderScreen()
+        });
   }
 }
 
@@ -61,37 +52,23 @@ class SplashScreen extends StatefulWidget {
 class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
-    Timer(const Duration(seconds: 3), () {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          builder: (BuildContext context) => const LoginScreen(),
-        ),
-      );
-    });
+    Timer(
+        const Duration(seconds: 3),
+        () => Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+                builder: (BuildContext context) => const LoginScreen())));
     super.initState();
   }
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: Center(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: const [
-            Text(
-              'MarketDo\nVendor',
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                  fontSize: 30, fontWeight: FontWeight.bold, letterSpacing: 2),
-            ),
-            Text(
-              'Vendor',
-              style: TextStyle(fontSize: 20),
-            )
-          ],
-        ),
-      ),
-    );
-  }
+  Widget build(BuildContext context) => const Scaffold(
+          body: Center(
+              child: Column(mainAxisSize: MainAxisSize.min, children: [
+        Text('MarketDo\nVendor',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+                fontSize: 30, fontWeight: FontWeight.bold, letterSpacing: 2)),
+        Text('Vendor', style: TextStyle(fontSize: 20))
+      ])));
 }

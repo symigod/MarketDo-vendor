@@ -14,11 +14,12 @@ class LandingScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    FirebaseServices _services = FirebaseServices();
+    FirebaseServices services = FirebaseServices();
     return Scaffold(
       body: StreamBuilder<DocumentSnapshot>(
-        stream: _services.vendor.doc(_services.user!.uid).snapshots(),
-        builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot> snapshot) {
+        stream: services.vendor.doc(services.user!.uid).snapshots(),
+        builder:
+            (BuildContext context, AsyncSnapshot<DocumentSnapshot> snapshot) {
           if (snapshot.hasError) {
             return const Center(child: Text('Something went wrong'));
           }
@@ -28,12 +29,13 @@ class LandingScreen extends StatelessWidget {
               child: CircularProgressIndicator(),
             );
           }
-          if(!snapshot.data!.exists){
+          if (!snapshot.data!.exists) {
             return const RegistrationScreen();
           }
 
-          Vendor vendor = Vendor.fromJson(snapshot.data!.data() as Map<String, dynamic>);
-          if (vendor.approved==true) {
+          Vendor vendor =
+              Vendor.fromJson(snapshot.data!.data() as Map<String, dynamic>);
+          if (vendor.approved == true) {
             return const HomeScreen();
           }
 
@@ -43,7 +45,7 @@ class LandingScreen extends StatelessWidget {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Container(
+                  SizedBox(
                     height: 80,
                     width: 80,
                     child: ClipRRect(
@@ -58,28 +60,36 @@ class LandingScreen extends StatelessWidget {
                       ),
                     ),
                   ),
-                  const SizedBox(height: 10,),
-                  Text(vendor.businessName!, style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+                  const SizedBox(
+                    height: 10,
                   ),
-                  const SizedBox(height: 10,),
-
-                  const Text('Your application sent to Marketdo App Admin\nAdmin will contact you soon',
+                  Text(
+                    vendor.businessName!,
+                    style: const TextStyle(
+                        fontSize: 22, fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  const Text(
+                    'Your application sent to Marketdo App Admin\nAdmin will contact you soon',
                     textAlign: TextAlign.center,
                     style: TextStyle(fontSize: 18, color: Colors.grey),
                   ),
                   OutlinedButton(
                     style: ButtonStyle(
-                      shape: MaterialStateProperty.all(RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(4),
-
-                      ),),
+                      shape: MaterialStateProperty.all(
+                        RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                      ),
                     ),
-                    onPressed: (){
+                    onPressed: () {
                       FirebaseAuth.instance.signOut().then((value) {
-                        Navigator.of(context).pushReplacement(
-                            MaterialPageRoute(
-                              builder: (BuildContext context) => const LoginScreen(),)
-                        );
+                        Navigator.of(context).pushReplacement(MaterialPageRoute(
+                          builder: (BuildContext context) =>
+                              const LoginScreen(),
+                        ));
                       });
                     },
                     child: const Text('Sign out'),
@@ -90,7 +100,6 @@ class LandingScreen extends StatelessWidget {
           );
         },
       ),
-
     );
   }
 }

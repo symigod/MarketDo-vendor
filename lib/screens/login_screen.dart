@@ -2,7 +2,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutterfire_ui/auth.dart';
 import 'package:marketdo_app_vendor/screens/landing_screen.dart';
-import 'package:marketdo_app_vendor/screens/registration_screen.dart';
 
 class LoginScreen extends StatelessWidget {
   static const String id = 'login-screen';
@@ -20,13 +19,13 @@ class LoginScreen extends StatelessWidget {
           return SignInScreen(
 
               headerBuilder: (context, constraints, _) {
-                return Padding(
-                  padding: const EdgeInsets.all(20),
+                return const Padding(
+                  padding: EdgeInsets.all(20),
                   child: AspectRatio(
                     aspectRatio: 1,
                     child: Center(
                       child: Column(
-                        children: const [
+                        children: [
                           Text(
                             'Marketdo App', style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),textAlign: TextAlign.center,),
                           Text('Vendor', style: TextStyle(fontSize: 20),

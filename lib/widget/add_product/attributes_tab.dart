@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/src/widgets/framework.dart';
-import 'package:flutter/src/widgets/placeholder.dart';
 import 'package:marketdo_app_vendor/provider/product_provider.dart';
 import 'package:provider/provider.dart';
 
@@ -72,6 +70,7 @@ class _AttributeTabState extends State<AttributeTab> with AutomaticKeepAliveClie
                if(value!.isEmpty){
                  return 'Select unit';
                }
+               return null;
               }
     );
   }
@@ -99,7 +98,7 @@ class _AttributeTabState extends State<AttributeTab> with AutomaticKeepAliveClie
             Expanded(
               child: TextFormField(
                 controller: _sizeText,
-                decoration: InputDecoration(
+                decoration: const InputDecoration(
                   label: Text('Size'),
                 ), 
                 onChanged: (value){
@@ -123,11 +122,11 @@ class _AttributeTabState extends State<AttributeTab> with AutomaticKeepAliveClie
                   _saved = false;
                 });
               }, 
-              child: Text('Add'), 
+              child: const Text('Add'), 
               )
           ],
         ),
-        SizedBox(height: 10,),
+        const SizedBox(height: 10,),
         if(_sizeList.isNotEmpty)
         SizedBox(
           height: 50,
@@ -157,7 +156,7 @@ class _AttributeTabState extends State<AttributeTab> with AutomaticKeepAliveClie
                   ),
                   child: Padding(
                     padding: const EdgeInsets.all(8.0),
-                    child: Center(child: Text(_sizeList[index], style: TextStyle(fontWeight: FontWeight.bold),)),
+                    child: Center(child: Text(_sizeList[index], style: const TextStyle(fontWeight: FontWeight.bold),)),
                   ),
                 ),
               ),

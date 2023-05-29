@@ -1,8 +1,6 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/src/widgets/framework.dart';
-import 'package:flutter/src/widgets/placeholder.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:marketdo_app_vendor/provider/product_provider.dart';
 import 'package:provider/provider.dart';
@@ -22,7 +20,7 @@ class _ImagesTabState extends State<ImagesTab>with AutomaticKeepAliveClientMixin
   
   
   Future<List<XFile>?> _pickImage() async {
-    final List<XFile>? image = await _picker.pickMultiImage();
+    final List<XFile> image = await _picker.pickMultiImage();
     return image;
   }
 
@@ -53,9 +51,9 @@ class _ImagesTabState extends State<ImagesTab>with AutomaticKeepAliveClientMixin
              Center(
                child: GridView.builder(
                 shrinkWrap: true,
-                physics: ScrollPhysics(),
+                physics: const ScrollPhysics(),
                 itemCount: provider.imageFiles!.length,
-                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: 2
                 ), itemBuilder: (context, index){
                   return Padding(

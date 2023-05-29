@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/src/widgets/framework.dart';
-import 'package:flutter/src/widgets/placeholder.dart';
 import 'package:marketdo_app_vendor/firebase_services.dart';
 import 'package:marketdo_app_vendor/provider/product_provider.dart';
 import 'package:provider/provider.dart';

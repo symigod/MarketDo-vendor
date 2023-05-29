@@ -1,11 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/src/widgets/framework.dart';
-import 'package:flutter/src/widgets/placeholder.dart';
-import 'package:flutter/widgets.dart';
 import 'package:marketdo_app_vendor/provider/vendor_provider.dart';
 import 'package:marketdo_app_vendor/screens/add_product_screen.dart';
 import 'package:marketdo_app_vendor/screens/home_screen.dart';
@@ -125,15 +121,15 @@ class _CustomDrawerState extends State<CustomDrawer> {
   bool _isActive = true;
 
   void _updateStatus(bool value) async {
-    final _firebaseUser = FirebaseAuth.instance.currentUser;
-    if (_firebaseUser != null) {
-      final _vendorDoc = FirebaseFirestore.instance
+    final firebaseUser = FirebaseAuth.instance.currentUser;
+    if (firebaseUser != null) {
+      final vendorDoc = FirebaseFirestore.instance
           .collection('vendor')
-          .doc(_firebaseUser.uid);
-      final docSnapshot = await _vendorDoc.get();
+          .doc(firebaseUser.uid);
+      final docSnapshot = await vendorDoc.get();
 
       if (docSnapshot.exists) {
-        await _vendorDoc.update({'isActive': value});
+        await vendorDoc.update({'isActive': value});
       } else {
         print('Document does not exist!');
       }
@@ -142,7 +138,7 @@ class _CustomDrawerState extends State<CustomDrawer> {
 
   @override
   Widget build(BuildContext context) {
-    final _vendorData = Provider.of<VendorProvider>(context);
+    final vendorData = Provider.of<VendorProvider>(context);
 
     Widget _menu({String? menuTitle, IconData? icon, String? route}) {
       return ListTile(
@@ -163,15 +159,15 @@ class _CustomDrawerState extends State<CustomDrawer> {
             child: Row(
               children: [
                 DrawerHeader(
-                  child: _vendorData.doc == null
+                  child: vendorData.doc == null
                       ? const Text('Fetching...',
                           style: TextStyle(color: Colors.white))
                       : Row(
                           children: [
                             CachedNetworkImage(
-                                imageUrl: _vendorData.doc!['logo']),
+                                imageUrl: vendorData.doc!['logo']),
                             const SizedBox(width: 10),
-                            Text(_vendorData.doc!['businessName'],
+                            Text(vendorData.doc!['businessName'],
                                 style: const TextStyle(color: Colors.white)),
                           ],
                         ),

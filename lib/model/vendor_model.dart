@@ -1,48 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class Vendor {
-
-  Vendor({
-    this.approved,
-    this.businessName,
-    this.city,
-    this.state,
-    this.country,
-    this.email,
-    this.landMark,
-    this.logo,
-    this.shopImage,
-    this.mobile,
-    this.pinCode,
-    this.taxRegistered,
-    this.time,
-    this.tinNumber,
-    // this.isActive = false,
-    this.uid});
-
-   
-
-  Vendor.fromJson(Map<String, Object?> json)
-      : this(
-    approved: json['approved']! as bool,
-    businessName: json['businessName']! as String,
-    city: json['city']! as String,
-    state: json['state']! as String,
-    country: json['country']! as String,
-    email: json['email']! as String,
-    landMark: json['landMark']! as String,
-    logo: json['logo']! as String,
-    mobile: json['mobile']! as String,
-    shopImage: json['shopImage']! as String,
-    pinCode: json['pinCode']! as String,
-    taxRegistered: json['taxRegistered']! as String,
-    time: json['time']! as Timestamp,
-    tinNumber: json['tinNumber']! as String,
-    // isActive: json['isActive']! as bool,
-    uid: json['uid']! as String,
-
-  );
-
   final bool? approved;
   final String? businessName;
   final String? city;
@@ -57,8 +15,46 @@ class Vendor {
   final String? taxRegistered;
   final Timestamp? time;
   final String? tinNumber;
-  // bool isActive;
-  final String? uid;
+  bool isActive;
+  final String? vendorID;
+
+  Vendor(
+      {this.approved,
+      this.businessName,
+      this.city,
+      this.state,
+      this.country,
+      this.email,
+      this.landMark,
+      this.logo,
+      this.shopImage,
+      this.mobile,
+      this.pinCode,
+      this.taxRegistered,
+      this.time,
+      this.tinNumber,
+      this.isActive = false,
+      this.vendorID});
+
+  Vendor.fromJson(Map<String, Object?> json)
+      : this(
+          approved: json['approved']! as bool,
+          businessName: json['businessName']! as String,
+          city: json['city']! as String,
+          state: json['state']! as String,
+          country: json['country']! as String,
+          email: json['email']! as String,
+          landMark: json['landMark']! as String,
+          logo: json['logo']! as String,
+          mobile: json['mobile']! as String,
+          shopImage: json['shopImage']! as String,
+          pinCode: json['pinCode']! as String,
+          taxRegistered: json['taxRegistered']! as String,
+          time: json['time']! as Timestamp,
+          tinNumber: json['tinNumber']! as String,
+          isActive: json['isActive']! as bool,
+          vendorID: json['vendorID']! as String,
+        );
 
   Map<String, Object?> toJson() {
     return {
@@ -76,12 +72,8 @@ class Vendor {
       'taxRegistered': taxRegistered,
       'time': time,
       'tinNumber': tinNumber,
-      // 'isActive' : isActive,
-      'uid': uid
+      'isActive': isActive,
+      'vendorID': vendorID
     };
   }
 }
-
-
-
-  

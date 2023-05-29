@@ -19,13 +19,13 @@ class AddProductScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
 
-    final _provider = Provider.of<ProductProvider>(context);
-    final _vendor = Provider.of<VendorProvider>(context);
-    final _formKey = GlobalKey<FormState>();
-    FirebaseServices _services = FirebaseServices();
+    final provider = Provider.of<ProductProvider>(context);
+    final vendor = Provider.of<VendorProvider>(context);
+    final formKey = GlobalKey<FormState>();
+    FirebaseServices services = FirebaseServices();
     
     return Form(
-      key: _formKey,
+      key: formKey,
       child: DefaultTabController(
         length: 5,
         initialIndex: 0,
@@ -75,38 +75,38 @@ class AddProductScreen extends StatelessWidget {
     
           persistentFooterButtons: [
             Padding(
-              padding: EdgeInsets.all(8.0),
+              padding: const EdgeInsets.all(8.0),
               child: ElevatedButton(
                 onPressed: (){
-                  if(_provider.imageFiles!.isEmpty){
-                    _services.scaffold(context, 'Image not selected');
+                  if(provider.imageFiles!.isEmpty){
+                    services.scaffold(context, 'Image not selected');
                     return;
 
                   }
-                  if (_formKey.currentState!.validate()) {
+                  if (formKey.currentState!.validate()) {
                     EasyLoading.show(status: 'Please wait..');
 
-                    _provider.getFormData(
+                    provider.getFormData(
                       seller: {
-                        'name': _vendor.vendor!.businessName,
-                        'uid': _services.user!.uid,
-                        'logo' : _vendor.vendor!.logo
+                        'name': vendor.vendor!.businessName,
+                        'uid': services.user!.uid,
+                        'logo' : vendor.vendor!.logo
                       }
                     );
-                    _services.uploadFiles(
-                      images: _provider.imageFiles, 
-                      ref: 'products/${_vendor.vendor!.businessName}/${_provider.productData!['productName']}',
-                      provider: _provider
+                    services.uploadFiles(
+                      images: provider.imageFiles, 
+                      ref: 'products/${vendor.vendor!.businessName}/${provider.productData!['productName']}',
+                      provider: provider
                       ).then((value) {
                         if(value.isNotEmpty){
 
-                          _services.saveToDb(
-                            data: _provider.productData,
+                          services.saveToDb(
+                            data: provider.productData,
                             context: context
                           ).then((value) {
                             EasyLoading.dismiss();
                             setState(){
-                              _provider.clearProductData();
+                              provider.clearProductData();
                             }
                             
                           });
@@ -117,7 +117,7 @@ class AddProductScreen extends StatelessWidget {
                   }
                 
                 }, 
-                child: Text('Save Product'),
+                child: const Text('Save Product'),
                 
                 ),
             )

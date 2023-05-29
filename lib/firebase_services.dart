@@ -23,11 +23,11 @@ class FirebaseServices {
       firebase_storage.FirebaseStorage.instance;
 
   Future<String> uploadImage(XFile? file, String? reference) async {
-    File _file = File(file!.path);
+    File file0 = File(file!.path);
 
     firebase_storage.Reference ref =
         firebase_storage.FirebaseStorage.instance.ref(reference);
-    await ref.putFile(_file);
+    await ref.putFile(file0);
     String downloadURL = await ref.getDownloadURL();
     return downloadURL;
   }
@@ -36,7 +36,7 @@ class FirebaseServices {
       {List<XFile>? images, String? ref, ProductProvider? provider}) async {
     var imageUrls = await Future.wait(
       images!.map(
-        (_image) => uploadFile(image: File(_image.path), reference: ref),
+        (image) => uploadFile(image: File(image.path), reference: ref),
       ),
     );
     provider!.getFormData(imageUrls: imageUrls);

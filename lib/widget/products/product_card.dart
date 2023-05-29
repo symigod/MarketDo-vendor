@@ -23,6 +23,31 @@ class ProductCard extends StatelessWidget {
           Product product = snapshot!.docs[index].data();
           String id = snapshot!.docs[index].id;
           return Slidable(
+            endActionPane: ActionPane(
+              motion: const ScrollMotion(),
+              children: [
+                SlidableAction(
+                  flex: 1,
+                  onPressed: (context) {},
+                  backgroundColor: Colors.red,
+                  foregroundColor: Colors.white,
+                  icon: Icons.delete,
+                  label: 'Delete',
+                ),
+                SlidableAction(
+                  flex: 1,
+                  onPressed: (context) {
+                    services.product.doc(id).update({
+                      'approved': product.approved == false ? true : false
+                    });
+                  },
+                  backgroundColor: Colors.green,
+                  foregroundColor: Colors.white,
+                  icon: Icons.approval,
+                  label: product.approved == false ? 'Approve' : 'Inactive',
+                ),
+              ],
+            ),
             child: InkWell(
               onTap: () {
                 Navigator.push(
@@ -56,7 +81,7 @@ class ProductCard extends StatelessWidget {
                           Text(product.productName!),
                           Text(
                             services.formattedNumber(product.regularPrice),
-                            style: TextStyle(
+                            style: const TextStyle(
                               color: Colors.red,
                             ),
                           ),
@@ -66,31 +91,6 @@ class ProductCard extends StatelessWidget {
                   ],
                 ),
               ),
-            ),
-            endActionPane: ActionPane(
-              motion: const ScrollMotion(),
-              children: [
-                SlidableAction(
-                  flex: 1,
-                  onPressed: (context) {},
-                  backgroundColor: Colors.red,
-                  foregroundColor: Colors.white,
-                  icon: Icons.delete,
-                  label: 'Delete',
-                ),
-                SlidableAction(
-                  flex: 1,
-                  onPressed: (context) {
-                    services.product.doc(id).update({
-                      'approved': product.approved == false ? true : false
-                    });
-                  },
-                  backgroundColor: Colors.green,
-                  foregroundColor: Colors.white,
-                  icon: Icons.approval,
-                  label: product.approved == false ? 'Approve' : 'Inactive',
-                ),
-              ],
             ),
           );
         },
