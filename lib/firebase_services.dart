@@ -10,7 +10,7 @@ import 'package:marketdo_app_vendor/provider/product_provider.dart';
 class FirebaseServices {
   User? user = FirebaseAuth.instance.currentUser;
   final CollectionReference vendor =
-      FirebaseFirestore.instance.collection('vendor');
+      FirebaseFirestore.instance.collection('vendors');
   final CollectionReference categories =
       FirebaseFirestore.instance.collection('categories');
   final CollectionReference mainCategories =
@@ -34,13 +34,9 @@ class FirebaseServices {
 
   Future<List> uploadFiles(
       {List<XFile>? images, String? ref, ProductProvider? provider}) async {
-    var imageUrls = await Future.wait(
-      images!.map(
-        (image) => uploadFile(image: File(image.path), reference: ref),
-      ),
-    );
+    var imageUrls = await Future.wait(images!
+        .map((image) => uploadFile(image: File(image.path), reference: ref)));
     provider!.getFormData(imageUrls: imageUrls);
-
     return imageUrls;
   }
 
@@ -56,91 +52,36 @@ class FirebaseServices {
     return storageReference.getDownloadURL();
   }
 
-  Future<void> addVendor({Map<String, dynamic>? data}) {
-    // Call the user's CollectionReference to add a new user
-    return vendor.doc(user!.uid).set(data).then((value) => print("User Added"));
-    // .catchError((error) => print("Failed to add user: $error"));
-  }
+  Future<void> addVendor({Map<String, dynamic>? data}) =>
+      vendor.doc(user!.uid).set(data).then((value) => print("User Added"));
 
-//   Future<Vendor> getVendor(String email) async {
-//   DocumentSnapshot snapshot = await vendor.doc(email).get();
-//   Map<String, dynamic> data = snapshot.data() as Map<String, dynamic>;
-//   return Vendor(
-//     businessName: data['businessName'],
-//     email: data['email'],
-//     isActive: data['isActive'],
-//   );
-// }
+  Future<void> saveToDb(
+          {Map<String, dynamic>? data, BuildContext? context}) async =>
+      product.add(data).then((value) => scaffold(context, 'Product Saved'));
 
-//   void updateVendorStatus(String email, bool isActive) {
-//   vendor.doc(email).updateData({'isActive': isActive});
-// }
+  String formattedDate(date) => DateFormat('dd/MM/yyyy hh:mm aa').format(date);
 
-//   Stream<Vendor> streamVendor(String email) {
-//   return vendor
-//       .doc(email)
-//       .snapshots()
-//       .map((snapshot) => Vendor(
-//             businessName: snapshot.data()!['businessName'],
-//             email: snapshot.data['email'],
-//             isActive: snapshot.data['isActive'],
-//           ));
-// }
-
-  Future<void> saveToDb({Map<String, dynamic>? data, BuildContext? context}) {
-    // Call the user's CollectionReference to add a new user
-    return product
-        .add(data)
-        .then((value) => scaffold(context, 'Product Saved'));
-    // .catchError((error) => print("Failed to add user: $error"));
-  }
-
-  String formattedDate(date) {
-    var outputFormat = DateFormat('dd/MM/yyyy hh:mm aa');
-    var outputDate = outputFormat.format(date);
-    return outputDate;
-  }
-
-  String formattedNumber(number) {
-    var f = NumberFormat("#,##,###");
-    String formattedNumber = f.format(number);
-    return formattedNumber;
-  }
+  String formattedNumber(number) => NumberFormat("#,##,###").format(number);
 
   Widget formField(
-      {String? label,
-      TextInputType? inputType,
-      void Function(String)? onChanged,
-      int? minLine,
-      int? maxLine}) {
-    return TextFormField(
-      keyboardType: inputType,
-      decoration: InputDecoration(
-        label: Text(label!),
-      ),
-      validator: (value) {
-        if (value!.isEmpty) {
-          return label;
-        }
-        return null;
-      },
-      onChanged: onChanged,
-      minLines: minLine,
-      maxLines: maxLine,
-    );
-  }
+          {String? label,
+          TextInputType? inputType,
+          void Function(String)? onChanged,
+          int? minLine,
+          int? maxLine}) =>
+      TextFormField(
+          keyboardType: inputType,
+          decoration: InputDecoration(label: Text(label!)),
+          validator: (value) => value!.isEmpty ? label : null,
+          onChanged: onChanged,
+          minLines: minLine,
+          maxLines: maxLine);
 
-  scaffold(context, message) {
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-      content: Text(
-        message,
-      ),
-      action: SnackBarAction(
-        label: 'OK',
-        onPressed: () {
-          ScaffoldMessenger.of(context).clearSnackBars();
-        },
-      ),
-    ));
-  }
+  scaffold(context, message) => ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+          content: Text(message),
+          action: SnackBarAction(
+              label: 'OK',
+              onPressed: () =>
+                  ScaffoldMessenger.of(context).clearSnackBars())));
 }

@@ -20,7 +20,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
   bool _editable = true;
   final _productName = TextEditingController();
   final _brand = TextEditingController();
-  final _salesPrice = TextEditingController();
+  // final _salesPrice = TextEditingController();
   final _regularPrice = TextEditingController();
   final _description = TextEditingController();
   final _soh = TextEditingController();

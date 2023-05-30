@@ -12,69 +12,68 @@ class ImagesTab extends StatefulWidget {
   State<ImagesTab> createState() => _ImagesTabState();
 }
 
-class _ImagesTabState extends State<ImagesTab>with AutomaticKeepAliveClientMixin {
+class _ImagesTabState extends State<ImagesTab>
+    with AutomaticKeepAliveClientMixin {
   @override
-  bool get wantKeepAlive=> true;
+  bool get wantKeepAlive => true;
 
   final ImagePicker _picker = ImagePicker();
-  
-  
+
   Future<List<XFile>?> _pickImage() async {
     final List<XFile> image = await _picker.pickMultiImage();
     return image;
   }
 
-  
   @override
   Widget build(BuildContext context) {
     super.build(context);
 
-   return Consumer<ProductProvider>(    
-    builder: (context, provider, child){
-       return Padding(
-      padding: const EdgeInsets.all(20.0),
-      child: ListView(
-        children: [
-          TextButton(
-            child: const Text('Add Product image'),
-            onPressed: (){
-              _pickImage().then((value) {
-                var list = value!.forEach((image) {
-                  setState(() {
-                    provider.getImageFile(image);
-                  });
-                });
-              });
-
-            },
-             ),
-             Center(
-               child: GridView.builder(
+    return Consumer<ProductProvider>(builder: (context, provider, child) {
+      return Padding(
+        padding: const EdgeInsets.all(20.0),
+        child: ListView(
+          children: [
+            TextButton(
+              child: const Text('Add Product image'),
+              onPressed: () {
+                // _pickImage().then((value) {
+                //   var list = value!.forEach((image) {
+                //     setState(() {
+                //       provider.getImageFile(image);
+                //     });
+                //   });
+                // });
+              },
+            ),
+            Center(
+              child: GridView.builder(
                 shrinkWrap: true,
                 physics: const ScrollPhysics(),
                 itemCount: provider.imageFiles!.length,
                 gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 2
-                ), itemBuilder: (context, index){
+                    crossAxisCount: 2),
+                itemBuilder: (context, index) {
                   return Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: InkWell(
-                      onLongPress: (){
-                        setState(() {
-                          provider.imageFiles!.removeAt(index);
-                        });
-                      },
-                      child: provider.imageFiles == null ? const Center(child: Text('No Images Selected'),
-                      ) : 
-                      Image.file(File(provider.imageFiles![index].path))),
+                        onLongPress: () {
+                          setState(() {
+                            provider.imageFiles!.removeAt(index);
+                          });
+                        },
+                        child: provider.imageFiles == null
+                            ? const Center(
+                                child: Text('No Images Selected'),
+                              )
+                            : Image.file(
+                                File(provider.imageFiles![index].path))),
                   );
                 },
-                ),
-             )
-        ],
-      ),
-    );
+              ),
+            )
+          ],
+        ),
+      );
     });
- 
   }
 }

@@ -1,10 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:marketdo_app_vendor/model/order_model.dart';
-import '../../widget/custom_drawer.dart';
-
-// static const String id = 'order-screen';
-// drawer: const CustomDrawer(),
 
 class OrderScreen extends StatefulWidget {
   static const String id = 'order-screen';
@@ -17,15 +13,14 @@ class OrderScreen extends StatefulWidget {
 
 class _OrderScreenState extends State<OrderScreen> {
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
+  Widget build(BuildContext context) => Scaffold(
       appBar: AppBar(
-        title: const Text('Orders'),
-      ),
-      body: const OrderCard(),
-      drawer: const CustomDrawer(),
-    );
-  }
+          elevation: 0,
+          backgroundColor: Colors.transparent,
+          centerTitle: true,
+          title:
+              Text('ORDERS', style: TextStyle(color: Colors.green.shade900))),
+      body: const OrderCard());
 }
 
 class OrderCard extends StatefulWidget {
@@ -55,32 +50,34 @@ class _OrderCardState extends State<OrderCard> {
               shrinkWrap: true,
               itemCount: snapshot.data!.length,
               itemBuilder: (context, index) {
-                var address = snapshot.data![index].address;
+                // var address = snapshot.data![index].address;
                 var customerName = snapshot.data![index].customerName;
-                var email = snapshot.data![index].email;
-                var landMark = snapshot.data![index].landMark;
-                var mobile = snapshot.data![index].mobile;
+                // var email = snapshot.data![index].email;
+                // var landMark = snapshot.data![index].landMark;
+                // var mobile = snapshot.data![index].mobile;
                 var orderStatus = snapshot.data![index].orderStatus;
-                var paymentMethod = snapshot.data![index].paymentMethod;
+                // var paymentMethod = snapshot.data![index].paymentMethod;
                 var products = snapshot.data![index].products;
                 var shippingFee = snapshot.data![index].shippingFee;
-                var shippingMethod = snapshot.data![index].shippingMethod;
+                // var shippingMethod = snapshot.data![index].shippingMethod;
                 var timeStamp = snapshot.data![index].time;
                 var totalAmount = snapshot.data![index].totalAmount;
-                var totalPrice = snapshot.data![index].totalPrice;
+                // var totalPrice = snapshot.data![index].totalPrice;
                 var uid = snapshot.data![index].uid;
-                var vendorName = snapshot.data![index].vendorName;
-
+                // var vendorName = snapshot.data![index].vendorName;
                 String month = timeStamp.toDate().month.toString();
                 String day = timeStamp.toDate().day.toString();
                 String year = timeStamp.toDate().year.toString();
                 String time = '$month-$day-$year';
-
                 return Padding(
                     padding:
                         const EdgeInsets.only(left: 10.0, right: 10, top: 10),
                     child: Card(
                         margin: EdgeInsets.zero,
+                        shape: RoundedRectangleBorder(
+                            side:
+                                const BorderSide(width: 1, color: Colors.black),
+                            borderRadius: BorderRadius.circular(5)),
                         child: Padding(
                             padding: const EdgeInsets.all(10.0),
                             child: Column(children: [
@@ -188,7 +185,7 @@ class _OrderCardState extends State<OrderCard> {
                                         style: ElevatedButton.styleFrom(
                                             backgroundColor:
                                                 orderStatus == 'Accepted'
-                                                    ? Colors.green
+                                                    ? Colors.green.shade900
                                                     : Colors.grey,
                                             minimumSize: const Size(150, 40)),
                                         child: const Text('Accept',
@@ -204,7 +201,7 @@ class _OrderCardState extends State<OrderCard> {
                                         style: ElevatedButton.styleFrom(
                                             backgroundColor:
                                                 orderStatus == 'Preparing'
-                                                    ? Colors.green
+                                                    ? Colors.green.shade900
                                                     : Colors.grey,
                                             minimumSize: const Size(150, 40)),
                                         child: const Text('Preparing',
@@ -225,7 +222,7 @@ class _OrderCardState extends State<OrderCard> {
                                         style: ElevatedButton.styleFrom(
                                             backgroundColor:
                                                 orderStatus == 'On Delivery'
-                                                    ? Colors.green
+                                                    ? Colors.green.shade900
                                                     : Colors.grey,
                                             minimumSize: const Size(150, 40)),
                                         child: const Text('On Delivery',
@@ -241,7 +238,7 @@ class _OrderCardState extends State<OrderCard> {
                                         style: ElevatedButton.styleFrom(
                                             backgroundColor:
                                                 orderStatus == 'Delivered'
-                                                    ? Colors.green
+                                                    ? Colors.green.shade900
                                                     : Colors.grey,
                                             minimumSize: const Size(150, 40)),
                                         child: const Text('Delivered',
