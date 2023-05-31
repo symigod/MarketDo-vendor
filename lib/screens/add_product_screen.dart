@@ -16,7 +16,6 @@ class AddProductScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final provider = Provider.of<ProductProvider>(context);
-    // final vendor = Provider.of<VendorProvider>(context);
     final formKey = GlobalKey<FormState>();
     FirebaseServices services = FirebaseServices();
 
@@ -27,9 +26,10 @@ class AddProductScreen extends StatelessWidget {
             initialIndex: 0,
             child: Scaffold(
                 appBar: AppBar(
+                    automaticallyImplyLeading: false,
                     backgroundColor: Colors.green.shade900,
                     elevation: 0,
-                    title: const Text('Add new products'),
+                    toolbarHeight: 0,
                     bottom: const TabBar(
                         isScrollable: true,
                         indicator: UnderlineTabIndicator(

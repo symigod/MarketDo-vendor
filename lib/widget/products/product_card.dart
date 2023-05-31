@@ -1,11 +1,6 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:flutterfire_ui/firestore.dart';
-import 'package:marketdo_app_vendor/firebase_services.dart';
-import 'package:marketdo_app_vendor/model/product_model.dart';
-import 'package:marketdo_app_vendor/widget/products/product_details.dart';
-
 
 class ProductCard extends StatelessWidget {
   const ProductCard({super.key, this.snapshot});
@@ -14,13 +9,13 @@ class ProductCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    FirebaseServices services = FirebaseServices();
+    // FirebaseServices services = FirebaseServices();
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: ListView.builder(
         itemCount: snapshot!.docs.length,
         itemBuilder: (context, index) {
-          Product product = snapshot!.docs[index].data();
+          // Product product = snapshot!.docs[index].data();
           String id = snapshot!.docs[index].id;
           return Slidable(
             endActionPane: ActionPane(
@@ -37,28 +32,27 @@ class ProductCard extends StatelessWidget {
                 SlidableAction(
                   flex: 1,
                   onPressed: (context) {
-                    services.product.doc(id).update({
-                      'approved': product.approved == false ? true : false
-                    });
+                    // services.product.doc(id).update(
+                    //     {'approved': product.approved == false ? true : false});
                   },
                   backgroundColor: Colors.green,
                   foregroundColor: Colors.white,
                   icon: Icons.approval,
-                  label: product.approved == false ? 'Approve' : 'Inactive',
+                  // label: product.approved == false ? 'Approve' : 'Inactive',
                 ),
               ],
             ),
             child: InkWell(
               onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (BuildContext context) => ProductDetailsScreen(
-                      product: product,
-                      productId: id,
-                    ),
-                  ),
-                );
+                // Navigator.push(
+                //   context,
+                //   MaterialPageRoute(
+                //     builder: (BuildContext context) => ProductDetailsScreen(
+                //       product: product,
+                //       productId: id,
+                //     ),
+                //   ),
+                // );
               },
               child: Card(
                 child: Row(
@@ -68,9 +62,9 @@ class ProductCard extends StatelessWidget {
                       width: 80,
                       child: Padding(
                         padding: const EdgeInsets.all(8.0),
-                        child: CachedNetworkImage(
-                          imageUrl: product.imageUrls![0],
-                        ),
+                        // child: CachedNetworkImage(
+                        //   imageUrl: product.imageUrls![0],
+                        // ),
                       ),
                     ),
                     Padding(
@@ -78,13 +72,13 @@ class ProductCard extends StatelessWidget {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(product.productName!),
-                          Text(
-                            services.formattedNumber(product.regularPrice),
-                            style: const TextStyle(
-                              color: Colors.red,
-                            ),
-                          ),
+                          // Text(product.productName!),
+                          // Text(
+                          //   services.formattedNumber(product.regularPrice),
+                          //   style: const TextStyle(
+                          //     color: Colors.red,
+                          //   ),
+                          // ),
                         ],
                       ),
                     ),

@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:marketdo_app_vendor/model/vendor_model.dart';
+import 'package:marketdo_app_vendor/screens/login_screen.dart';
 import 'package:marketdo_app_vendor/widget/dialogs.dart';
 import 'package:marketdo_app_vendor/widget/stream_widgets.dart';
 
@@ -106,9 +107,12 @@ class _CustomDrawerState extends State<CustomDrawer> {
                             ]))),
                     ListTile(
                         dense: true,
+                        isThreeLine: true,
                         leading: const Icon(Icons.store),
-                        title: Text(vendor.businessName),
-                        subtitle: Text(vendor.vendorID)),
+                        title: Text(vendor.businessName,
+                            style:
+                                const TextStyle(fontWeight: FontWeight.bold)),
+                        subtitle: Text('Vendor ID: ${vendor.vendorID}')),
                     ListTile(
                         dense: true,
                         leading: const Icon(Icons.perm_phone_msg),
@@ -161,7 +165,22 @@ class _CustomDrawerState extends State<CustomDrawer> {
                             value: _isActive,
                             onChanged: (value) => _updateStatus(value),
                             activeColor: Colors.green.shade900,
-                            inactiveThumbColor: Colors.red))
+                            inactiveThumbColor: Colors.red)),
+                    ListTile(
+                        onTap: () => showDialog(
+                            context: context,
+                            builder: (_) => confirmDialog(context, 'LOGOUT',
+                                    'Do you want to continue?', () {
+                                  FirebaseAuth.instance.signOut();
+                                  Navigator.pushReplacementNamed(
+                                      context, LoginScreen.id);
+                                })),
+                        dense: true,
+                        tileColor: Colors.red,
+                        title: const Text('Logout MarketDo App',
+                            style: TextStyle(color: Colors.white)),
+                        trailing:
+                            const Icon(Icons.exit_to_app, color: Colors.white))
                   ])
                 ]));
           }

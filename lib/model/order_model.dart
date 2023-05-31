@@ -1,82 +1,58 @@
+// ignore_for_file: prefer_typing_uninitialized_variables
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-class Orders {
-  final address;
-  final customerName;
-  final email;
-  final landMark;
-  final mobile;
+class OrderModel {
+  final customerID;
+  final orderID;
   final orderStatus;
   final paymentMethod;
-  final products;
+  final productIDs;
   final shippingFee;
   final shippingMethod;
-  final time;
-  final totalAmount;
-  final totalPrice;
-  final uid;
-  final vendorName;
+  final orderedOn;
+  final totalPayment;
+  final vendorID;
 
-  const Orders({
-    required this.address,
-    required this.customerName,
-    required this.email,
-    required this.landMark,
-    required this.mobile,
+  OrderModel({
+    required this.customerID,
+    required this.orderID,
     required this.orderStatus,
     required this.paymentMethod,
-    required this.products,
+    required this.productIDs,
     required this.shippingFee,
     required this.shippingMethod,
-    required this.time,
-    required this.totalAmount,
-    required this.totalPrice,
-    required this.uid,
-    required this.vendorName,
+    required this.orderedOn,
+    required this.totalPayment,
+    required this.vendorID,
   });
 
-  Map<String, dynamic> toMap() {
-    return {
-      'address': address,
-      'customerName': customerName,
-      'email': email,
-      'landMark': landMark,
-      'mobile': mobile,
-      'orderStatus': orderStatus,
-      'paymentMethod': paymentMethod,
-      'products': products,
-      'shippingFee': shippingFee,
-      'shippingMethod': shippingMethod,
-      'time': time,
-      'totalAmount': totalAmount,
-      'totalPrice': totalPrice,
-      'uid': uid,
-      'vendorName': vendorName,
-    };
-  }
-
-  factory Orders.fromMap(Map<String, dynamic> map) {
-    return Orders(
-      address: map['address'],
-      customerName: map['customerName'],
-      email: map['email'],
-      landMark: map['landMark'],
-      mobile: map['mobile'],
-      orderStatus: map['orderStatus'],
-      paymentMethod: map['paymentMethod'],
-      products: map['products'],
-      shippingFee: map['shippingFee'],
-      shippingMethod: map['shippingMethod'],
-      time: map['time'],
-      totalAmount: map['totalAmount'],
-      totalPrice: map['totalPrice'],
-      uid: map['uid'],
-      vendorName: map['vendorName'],
+  factory OrderModel.fromFirestore(DocumentSnapshot doc) {
+    Map<String, dynamic> data = (doc.data() as Map<String, dynamic>);
+    return OrderModel(
+      customerID: data['customerID'],
+      orderID: data['orderID'],
+      orderStatus: data['orderStatus'],
+      paymentMethod: data['paymentMethod'],
+      productIDs: data['productIDs'],
+      shippingFee: data['shippingFee'],
+      shippingMethod: data['shippingMethod'],
+      orderedOn: data['orderedOn'],
+      totalPayment: data['totalPayment'],
+      vendorID: data['vendorID'],
     );
   }
-}
 
-Stream<List<Orders>> getOrders() {
-  return FirebaseFirestore.instance.collection('orders').snapshots().map(
-      (order) => order.docs.map((doc) => Orders.fromMap(doc.data())).toList());
+  Map<String, dynamic> toFirestore() => {
+        'customerID': customerID,
+        'orderID': orderID,
+        'orderStatus': orderStatus,
+        'paymentMethod': paymentMethod,
+        'productIDs': productIDs,
+        'shippingFee': shippingFee,
+        'shippingMethod': shippingMethod,
+        'orderedOn': orderedOn,
+        'totalPayment': totalPayment,
+        'vendorID': vendorID,
+      };
 }
