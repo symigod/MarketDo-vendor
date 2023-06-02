@@ -127,7 +127,7 @@ class _OrderCardState extends State<OrderCard> {
                   //           ]));
                   //     }),
                   const SizedBox(height: 10),
-                  Row(
+                  const Row(
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
                       children: [
                         Column(children: [
@@ -141,10 +141,10 @@ class _OrderCardState extends State<OrderCard> {
                           //         fontWeight: FontWeight.bold))
                         ]),
                         Column(children: [
-                          const Text('Total Payment',
+                          Text('Total Payment',
                               style: TextStyle(
                                   fontSize: 12, fontWeight: FontWeight.bold)),
-                          const SizedBox(height: 10),
+                          SizedBox(height: 10),
                           // Text(totalAmount.toString(),
                           //     style: const TextStyle(
                           //         fontSize: 14,

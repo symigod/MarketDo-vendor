@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:marketdo_app_vendor/screens/add_product_screen.dart';
+import 'package:marketdo_app_vendor/widget/products/published_product.dart';
 import 'package:marketdo_app_vendor/widget/products/un_published.dart';
 import 'package:tab_indicator_styler/tab_indicator_styler.dart';
-
-import '../widget/products/published_product.dart';
 
 class ProductScreen extends StatelessWidget {
   static const String id = 'product-screen';

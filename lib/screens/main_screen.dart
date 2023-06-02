@@ -15,49 +15,54 @@ class MainScreen extends StatefulWidget {
 }
 
 class _MainScreenState extends State<MainScreen> {
-  List<Widget> screens = [const ProductScreen(), const OrderScreen()];
+  List<Widget> screens = [
+    const ProductScreen(),
+    const OrderScreen(),
+    const ProductScreen()
+  ];
   int currentScreen = 0;
   @override
   Widget build(BuildContext context) => SafeArea(
-          child: Scaffold(
-        appBar: AppBar(
-            elevation: 0,
-            backgroundColor: Colors.green.shade900,
-            centerTitle: true,
-            title: const FittedBox(
-                child: Text('MarketDo App',
-                    style: TextStyle(
-                        fontWeight: FontWeight.bold, letterSpacing: 2))),
-            actions: [
-              IconButton(
-                  onPressed: () => showDialog(
-                      context: context,
-                      builder: (_) => errorDialog(
-                          context, 'This feature will be available soon!')),
-                  icon: const Icon(Icons.notifications, color: Colors.white))
-            ]),
-        drawer: const CustomDrawer(),
-        body: screens[currentScreen],
-        // floatingActionButtonLocation: FloatingActionButtonLocation.endDocked,
-        // floatingActionButton: FloatingActionButton(
-        //     onPressed: () => Navigator.push(context,
-        //         MaterialPageRoute(builder: (_) => const AddProductScreen())),
-        //     backgroundColor: Colors.green.shade900,
-        //     child: const Icon(Icons.add_business)),
-        bottomNavigationBar: BottomNavigationBar(
-            backgroundColor: Colors.green.shade900,
-            currentIndex: currentScreen,
-            onTap: (int index) => setState(() => currentScreen = index),
-            selectedItemColor: Colors.yellow,
-            showUnselectedLabels: true,
-            unselectedItemColor: Colors.white,
-            items: const [
-              BottomNavigationBarItem(
-                  icon: Icon(Icons.shopping_cart), label: 'Products'),
-              BottomNavigationBarItem(
-                  icon: Icon(Icons.shopping_bag), label: 'Orders')
-            ]),
-      ));
+      child: Scaffold(
+          appBar: AppBar(
+              elevation: 0,
+              backgroundColor: Colors.green.shade900,
+              centerTitle: true,
+              title: const FittedBox(
+                  child: Text('MarketDo App',
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold, letterSpacing: 2))),
+              actions: [
+                IconButton(
+                    onPressed: () => showDialog(
+                        context: context,
+                        builder: (_) => errorDialog(
+                            context, 'This feature will be available soon!')),
+                    icon: const Icon(Icons.notifications, color: Colors.white))
+              ]),
+          drawer: const CustomDrawer(),
+          body: screens[currentScreen],
+          // floatingActionButtonLocation: FloatingActionButtonLocation.endDocked,
+          // floatingActionButton: FloatingActionButton(
+          //     onPressed: () => Navigator.push(context,
+          //         MaterialPageRoute(builder: (_) => const AddProductScreen())),
+          //     backgroundColor: Colors.green.shade900,
+          //     child: const Icon(Icons.add_business)),
+          bottomNavigationBar: BottomNavigationBar(
+              backgroundColor: Colors.green.shade900,
+              currentIndex: currentScreen,
+              onTap: (int index) => setState(() => currentScreen = index),
+              selectedItemColor: Colors.yellow,
+              showUnselectedLabels: true,
+              unselectedItemColor: Colors.white,
+              items: const [
+                BottomNavigationBarItem(
+                    icon: Icon(Icons.shopping_cart), label: 'Products'),
+                BottomNavigationBarItem(
+                    icon: Icon(Icons.shopping_bag), label: 'Orders'),
+                BottomNavigationBarItem(
+                    icon: Icon(Icons.block), label: 'Blocked')
+              ])));
 
   Widget bottomBar() {
     return BottomAppBar(

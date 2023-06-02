@@ -16,7 +16,7 @@ class ProductCard extends StatelessWidget {
         itemCount: snapshot!.docs.length,
         itemBuilder: (context, index) {
           // Product product = snapshot!.docs[index].data();
-          String id = snapshot!.docs[index].id;
+          // String id = snapshot!.docs[index].id;
           return Slidable(
             endActionPane: ActionPane(
               motion: const ScrollMotion(),
@@ -54,21 +54,21 @@ class ProductCard extends StatelessWidget {
                 //   ),
                 // );
               },
-              child: Card(
+              child: const Card(
                 child: Row(
                   children: [
                     SizedBox(
                       height: 80,
                       width: 80,
                       child: Padding(
-                        padding: const EdgeInsets.all(8.0),
+                        padding: EdgeInsets.all(8.0),
                         // child: CachedNetworkImage(
                         //   imageUrl: product.imageUrls![0],
                         // ),
                       ),
                     ),
                     Padding(
-                      padding: const EdgeInsets.all(8.0),
+                      padding: EdgeInsets.all(8.0),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [

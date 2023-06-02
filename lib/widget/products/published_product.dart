@@ -21,7 +21,7 @@ class PublishedProduct extends StatelessWidget {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return streamLoadingWidget();
         }
-        if (snapshot.hasData) {
+        if (snapshot.data!.docs.isNotEmpty) {
           return GridView.builder(
               shrinkWrap: true,
               physics: const ScrollPhysics(),

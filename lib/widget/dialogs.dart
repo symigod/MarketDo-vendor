@@ -27,3 +27,5 @@ Widget successDialog(BuildContext context, String message) =>
 
 String dateTimeToString(Timestamp timestamp) =>
     DateFormat('MMM dd, yyyy').format(timestamp.toDate()).toString();
+
+String numberToString(double number)=>NumberFormat('#, ###').format(number);
