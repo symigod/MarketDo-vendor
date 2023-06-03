@@ -79,9 +79,10 @@ class FirebaseServices {
 
   scaffold(context, message) => ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-          content: Text(message),
+          content: Text(message, style: const TextStyle(fontFamily: 'Lato')),
           action: SnackBarAction(
               label: 'OK',
+              textColor: Colors.white,
               onPressed: () =>
                   ScaffoldMessenger.of(context).clearSnackBars())));
 }

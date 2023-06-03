@@ -3,7 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:marketdo_app_vendor/model/product_model.dart';
-import 'package:marketdo_app_vendor/widget/stream_widgets.dart';
+import 'package:marketdo_app_vendor/widget/api_widgets.dart';
 
 class PublishedProduct extends StatelessWidget {
   const PublishedProduct({super.key});
@@ -16,10 +16,10 @@ class PublishedProduct extends StatelessWidget {
           .snapshots(),
       builder: ((context, snapshot) {
         if (snapshot.hasError) {
-          return streamErrorWidget(snapshot.error.toString());
+          return errorWidget(snapshot.error.toString());
         }
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return streamLoadingWidget();
+          return loadingWidget();
         }
         if (snapshot.data!.docs.isNotEmpty) {
           return GridView.builder(
@@ -60,6 +60,6 @@ class PublishedProduct extends StatelessWidget {
                             ]))));
               });
         }
-        return streamEmptyWidget('NO PUBLISHED PRODUCTS');
+        return emptyWidget('NO PUBLISHED PRODUCTS');
       }));
 }

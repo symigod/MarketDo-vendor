@@ -19,10 +19,7 @@ class _ImagesTabState extends State<ImagesTab>
 
   final ImagePicker _picker = ImagePicker();
 
-  Future<List<XFile>?> _pickImage() async {
-    final List<XFile> image = await _picker.pickMultiImage();
-    return image;
-  }
+  Future<List<XFile>?> _pickImage() async => await _picker.pickMultiImage();
 
   @override
   Widget build(BuildContext context) {
@@ -34,17 +31,9 @@ class _ImagesTabState extends State<ImagesTab>
         child: ListView(
           children: [
             TextButton(
-              child: const Text('Add Product image'),
-              onPressed: () {
-                // _pickImage().then((value) {
-                //   var list = value!.forEach((image) {
-                //     setState(() {
-                //       provider.getImageFile(image);
-                //     });
-                //   });
-                // });
-              },
-            ),
+                child: const Text('Add Product image'),
+                onPressed: () => _pickImage().then((value) => value!.forEach(
+                    (image) => setState(() => provider.getImageFile(image))))),
             Center(
               child: GridView.builder(
                 shrinkWrap: true,

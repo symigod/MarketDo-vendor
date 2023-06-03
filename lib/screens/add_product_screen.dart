@@ -3,11 +3,11 @@ import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:marketdo_app_vendor/firebase_services.dart';
 import 'package:marketdo_app_vendor/provider/product_provider.dart';
 import 'package:marketdo_app_vendor/widget/add_product/attributes_tab.dart';
+import 'package:marketdo_app_vendor/widget/add_product/general_tab.dart';
 import 'package:marketdo_app_vendor/widget/add_product/images_tab.dart';
 import 'package:marketdo_app_vendor/widget/add_product/inventory_tab.dart';
 import 'package:marketdo_app_vendor/widget/add_product/shipping_tab.dart';
 import 'package:provider/provider.dart';
-import '../widget/add_product/general_tab.dart';
 
 class AddProductScreen extends StatelessWidget {
   static const String id = 'add-product-screen';

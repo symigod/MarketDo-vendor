@@ -6,7 +6,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:marketdo_app_vendor/screens/login_screen.dart';
 import 'package:marketdo_app_vendor/screens/main_screen.dart';
-import 'package:marketdo_app_vendor/widget/stream_widgets.dart';
+import 'package:marketdo_app_vendor/widget/api_widgets.dart';
 
 class LandingScreen extends StatefulWidget {
   const LandingScreen({Key? key}) : super(key: key);
@@ -27,9 +27,9 @@ class _LandingScreenState extends State<LandingScreen> {
           builder:
               (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
             if (snapshot.hasError) {
-              return Text('Error: ${snapshot.error}');
+              return errorWidget(snapshot.error.toString());
             } else if (snapshot.connectionState == ConnectionState.waiting) {
-              return streamLoadingWidget();
+              return loadingWidget();
             } else {
               final vendors = snapshot.data?.docs ?? [];
               for (var vendor in vendors) {
@@ -52,7 +52,7 @@ class _LandingScreenState extends State<LandingScreen> {
                                   const LandingWidget())));
                 }
               }
-              return streamLoadingWidget();
+              return loadingWidget();
             }
           });
     } else {
@@ -62,7 +62,7 @@ class _LandingScreenState extends State<LandingScreen> {
               context,
               MaterialPageRoute(
                   builder: (BuildContext context) => const LoginScreen())));
-      return streamLoadingWidget();
+      return loadingWidget();
     }
   }
 
@@ -94,10 +94,10 @@ class _LandingWidgetState extends State<LandingWidget> {
               .snapshots(),
           builder: (context, snapshot) {
             if (snapshot.hasError) {
-              return streamErrorWidget(snapshot.error.toString());
+              return errorWidget(snapshot.error.toString());
             }
             if (snapshot.connectionState == ConnectionState.waiting) {
-              return streamLoadingWidget();
+              return loadingWidget();
             }
             if (snapshot.hasData) {
               final List<DocumentSnapshot> vendor = snapshot.data!.docs;
@@ -150,6 +150,6 @@ class _LandingWidgetState extends State<LandingWidget> {
                                     child: const Text('Sign out'))
                               ])))));
             }
-            return streamEmptyWidget('VENDOR NOT FOUND');
+            return emptyWidget('VENDOR NOT FOUND');
           }));
 }

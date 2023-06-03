@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:marketdo_app_vendor/widget/stream_widgets.dart';
+import 'package:marketdo_app_vendor/widget/api_widgets.dart';
 
 class PendingOrdersScreen extends StatefulWidget {
   const PendingOrdersScreen({super.key});
@@ -19,10 +19,10 @@ class _PendingOrdersScreenState extends State<PendingOrdersScreen> {
           .snapshots(),
       builder: (context, snapshot) {
         if (snapshot.hasError) {
-          return streamErrorWidget(snapshot.error.toString());
+          return errorWidget(snapshot.error.toString());
         }
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return streamLoadingWidget();
+          return loadingWidget();
         }
         if (snapshot.data!.docs.isNotEmpty) {
           var orders = snapshot.data!.docs;
@@ -40,11 +40,11 @@ class _PendingOrdersScreenState extends State<PendingOrdersScreen> {
                         .get(),
                     builder: (context, cSnapshot) {
                       if (cSnapshot.hasError) {
-                        return streamErrorWidget(cSnapshot.error.toString());
+                        return errorWidget(cSnapshot.error.toString());
                       }
                       if (cSnapshot.connectionState ==
                           ConnectionState.waiting) {
-                        return streamLoadingWidget();
+                        return loadingWidget();
                       }
                       if (cSnapshot.data!.docs.isNotEmpty) {
                         var customer = cSnapshot.data!.docs[0];
@@ -71,10 +71,10 @@ class _PendingOrdersScreenState extends State<PendingOrdersScreen> {
                                     color: Colors.red,
                                     fontWeight: FontWeight.bold)));
                       }
-                      return streamEmptyWidget('CUSTOMER NOT FOUND');
+                      return emptyWidget('CUSTOMER NOT FOUND');
                     });
               });
         }
-        return streamEmptyWidget('NO ORDERS YET');
+        return emptyWidget('NO ORDERS YET');
       });
 }
