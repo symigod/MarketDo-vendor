@@ -6,6 +6,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 import 'package:image_picker/image_picker.dart';
 import 'package:marketdo_app_vendor/provider/product_provider.dart';
+import 'package:marketdo_app_vendor/widget/dialogs.dart';
 
 class FirebaseServices {
   User? user = FirebaseAuth.instance.currentUser;
@@ -68,14 +69,26 @@ class FirebaseServices {
           TextInputType? inputType,
           void Function(String)? onChanged,
           int? minLine,
-          int? maxLine}) =>
-      TextFormField(
-          keyboardType: inputType,
-          decoration: InputDecoration(label: Text(label!)),
-          validator: (value) => value!.isEmpty ? label : null,
-          onChanged: onChanged,
-          minLines: minLine,
-          maxLines: maxLine);
+          int? maxLine,
+          String? unit}) =>
+      Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+          child: TextFormField(
+              keyboardType: inputType,
+              decoration: InputDecoration(
+                  border: const OutlineInputBorder(),
+                  label: Text(label!),
+                  prefixText:
+                      label == 'Regular price' || label == 'Transport Charge'
+                          ? 'PHP '
+                          : null,
+                  suffixText: label == 'Regular price'
+                      ? ' per ${unitAbbreviation(unit!)}'
+                      : null),
+              validator: (value) => value!.isEmpty ? label : null,
+              onChanged: onChanged,
+              minLines: minLine,
+              maxLines: null));
 
   scaffold(context, message) => ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(

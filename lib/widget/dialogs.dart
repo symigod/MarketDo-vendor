@@ -28,4 +28,11 @@ Widget successDialog(BuildContext context, String message) =>
 String dateTimeToString(Timestamp timestamp) =>
     DateFormat('MMM dd, yyyy').format(timestamp.toDate()).toString();
 
-String numberToString(double number)=>NumberFormat('#, ###').format(number);
+String numberToString(double number) => NumberFormat('#, ###').format(number);
+
+String unitAbbreviation(String selectedValue) {
+  RegExp regex = RegExp(r'\((.*?)\)');
+  Match? match = regex.firstMatch(selectedValue);
+  String abbreviation = match?.group(1) ?? '';
+  return abbreviation;
+}

@@ -57,7 +57,7 @@ class _MainScreenState extends State<MainScreen> {
               unselectedItemColor: Colors.white,
               items: const [
                 BottomNavigationBarItem(
-                    icon: Icon(Icons.shopping_cart), label: 'Products'),
+                    icon: Icon(Icons.shopping_cart), label: 'My Products'),
                 BottomNavigationBarItem(
                     icon: Icon(Icons.shopping_bag), label: 'Orders'),
                 BottomNavigationBarItem(
