@@ -2,7 +2,6 @@ import 'dart:async';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
-import 'package:marketdo_app_vendor/provider/product_provider.dart';
 import 'package:marketdo_app_vendor/screens/add_product_screen.dart';
 import 'package:marketdo_app_vendor/screens/home_screen.dart';
 import 'package:marketdo_app_vendor/screens/login_screen.dart';
@@ -28,10 +27,11 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
   Provider.debugCheckInvalidValueType = null;
-  runApp(MultiProvider(providers: [
-    // Provider<VendorProvider>(create: (_) => VendorProvider()),
-    Provider<ProductProvider>(create: (_) => ProductProvider())
-  ], child: const MyApp()));
+  runApp(const MyApp());
+  //   MultiProvider(providers: const [
+  //   // Provider<VendorProvider>(create: (_) => VendorProvider()),
+  //   // Provider<ProductProvider>(create: (_) => ProductProvider())
+  // ],
 }
 
 class MyApp extends StatelessWidget {
@@ -78,7 +78,6 @@ class _SplashScreenState extends State<SplashScreen> {
         Text('MarketDo\nVendor',
             textAlign: TextAlign.center,
             style: TextStyle(
-                fontSize: 30, fontWeight: FontWeight.bold, letterSpacing: 2)),
-        Text('Vendor', style: TextStyle(fontSize: 20))
+                fontSize: 30, fontWeight: FontWeight.bold, letterSpacing: 2))
       ])));
 }

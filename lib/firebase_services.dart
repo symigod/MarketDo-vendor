@@ -5,7 +5,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 import 'package:image_picker/image_picker.dart';
-import 'package:marketdo_app_vendor/provider/product_provider.dart';
 import 'package:marketdo_app_vendor/widget/dialogs.dart';
 
 class FirebaseServices {
@@ -33,13 +32,13 @@ class FirebaseServices {
     return downloadURL;
   }
 
-  Future<List> uploadFiles(
-      {List<XFile>? images, String? ref, ProductProvider? provider}) async {
-    var imageUrls = await Future.wait(images!
-        .map((image) => uploadFile(image: File(image.path), reference: ref)));
-    provider!.getFormData(imageUrls: imageUrls);
-    return imageUrls;
-  }
+  // Future<List> uploadFiles(
+  //     {List<XFile>? images, String? ref, ProductProvider? provider}) async {
+  //   var imageUrls = await Future.wait(images!
+  //       .map((image) => uploadFile(image: File(image.path), reference: ref)));
+  //   provider!.getFormData(imageUrls: imageUrls);
+  //   return imageUrls;
+  // }
 
   Future uploadFile({
     File? image,
@@ -64,7 +63,7 @@ class FirebaseServices {
 
   String formattedNumber(number) => NumberFormat("#,##,###").format(number);
 
-  Widget formField(
+  Widget formField(TextEditingController controller,
           {String? label,
           TextInputType? inputType,
           void Function(String)? onChanged,
@@ -74,6 +73,7 @@ class FirebaseServices {
       Padding(
           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
           child: TextFormField(
+              controller: controller,
               keyboardType: inputType,
               decoration: InputDecoration(
                   border: const OutlineInputBorder(),
@@ -82,8 +82,8 @@ class FirebaseServices {
                       label == 'Regular price' || label == 'Transport Charge'
                           ? 'PHP '
                           : null,
-                  suffixText: label == 'Regular price'
-                      ? ' per ${unitAbbreviation(unit!)}'
+                  suffixText: label == 'Regular price' && unit != null
+                      ? ' per ${unitAbbreviation(unit)}'
                       : null),
               validator: (value) => value!.isEmpty ? label : null,
               onChanged: onChanged,

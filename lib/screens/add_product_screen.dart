@@ -1,11 +1,12 @@
 import 'dart:io';
-
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:marketdo_app_vendor/firebase_services.dart';
-import 'package:marketdo_app_vendor/provider/product_provider.dart';
-import 'package:provider/provider.dart';
+import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
+import 'package:marketdo_app_vendor/widget/api_widgets.dart';
+import 'package:marketdo_app_vendor/widget/dialogs.dart';
 
 class AddProductScreen extends StatefulWidget {
   static const String id = 'add-product-screen';
@@ -20,8 +21,6 @@ class _AddProductScreenState extends State<AddProductScreen>
   @override
   bool get wantKeepAlive => true;
   final FirebaseServices _services = FirebaseServices();
-  final List<String> _categories = [];
-  String? selectedCategory;
   // final List<String> _sizeList = [];
   // bool? _saved = false;
 
@@ -68,15 +67,78 @@ class _AddProductScreenState extends State<AddProductScreen>
     'Bag (bag)',
     'Sack (sack)'
   ];
+
+  // Future<List<XFile>?> _pickImage() async => await _picker.pickMultiImage();
   final List<String> _units = [];
   bool? _manageInventory = false;
   bool? _chargeShipping = false;
-  final ImagePicker _picker = ImagePicker();
-  Future<List<XFile>?> _pickImage() async => await _picker.pickMultiImage();
+
+  TextEditingController productName = TextEditingController();
+  TextEditingController description = TextEditingController();
+  TextEditingController regularPrice = TextEditingController();
+  TextEditingController stockOnHand = TextEditingController();
+  TextEditingController shippingCharge = TextEditingController();
+  XFile? _pickedImage;
+  String? _downloadURL;
+
+  Future<void> _pickAndUploadImage() async {
+    final picker = ImagePicker();
+    final pickedImage = await picker.pickImage(source: ImageSource.gallery);
+
+    if (pickedImage != null) {
+      setState(() {
+        _pickedImage = pickedImage;
+        _isImageSelected = true;
+      });
+
+      firebase_storage.Reference ref = firebase_storage.FirebaseStorage.instance
+          .ref()
+          .child('category_images')
+          .child(DateTime.now().millisecondsSinceEpoch.toString());
+
+      firebase_storage.UploadTask uploadTask =
+          ref.putFile(File(_pickedImage!.path));
+
+      firebase_storage.TaskSnapshot snapshot = await uploadTask;
+      setState(() async => _downloadURL = await snapshot.ref.getDownloadURL());
+    }
+  }
+
+  bool _isImageSelected = false;
+
+  void _cancelImageSelection() {
+    setState(() {
+      _pickedImage = null;
+      _downloadURL = null;
+      _isImageSelected = false;
+    });
+  }
+
+  String? selectedCategory;
+  List<String> categories = [];
+
+  Future<void> fetchCategories() async {
+    try {
+      QuerySnapshot snapshot = await FirebaseFirestore.instance
+          .collection('categories')
+          .orderBy('category')
+          .get();
+      List<String> fetchedCategories = [];
+      snapshot.docs.forEach((doc) {
+        fetchedCategories.add(doc['category']);
+      });
+
+      setState(() {
+        categories = fetchedCategories;
+        selectedCategory = (categories.isNotEmpty ? categories[0] : null)!;
+      });
+    } catch (error) {
+      print('Error fetching categories: $error');
+    }
+  }
 
   @override
   void initState() {
-    getCategories();
     _units.addAll(_length);
     _units.addAll(_weight);
     _units.addAll(_volume);
@@ -85,22 +147,35 @@ class _AddProductScreenState extends State<AddProductScreen>
     _units.addAll(_container);
     _units.sort();
     super.initState();
-  }
-
-  getCategories() {
-    _services.categories.get().then((value) {
-      for (var element in value.docs) {
-        setState(() => _categories.add(element['catName']));
-      }
-    });
+    fetchCategories();
   }
 
   @override
   Widget build(BuildContext context) {
-    super.build(context);
-    final provider = Provider.of<ProductProvider>(context);
-    final formKey = GlobalKey<FormState>();
+    Widget buildCategoryDropdown() {
+      if (categories.isEmpty) {
+        return loadingWidget();
+      } else {
+        return Padding(
+            padding: const EdgeInsets.all(10),
+            child: DropdownButtonFormField<String>(
+                dropdownColor: Colors.yellow,
+                decoration: const InputDecoration(border: OutlineInputBorder()),
+                value: selectedCategory,
+                hint: const Text('Select category'),
+                onChanged: (newValue) =>
+                    setState(() => selectedCategory = newValue!),
+                items: categories.map<DropdownMenuItem<String>>((String value) {
+                  return DropdownMenuItem<String>(
+                      value: value, child: Text(value));
+                }).toList(),
+                validator: (value) =>
+                    value!.isEmpty ? 'Select category' : null));
+      }
+    }
 
+    super.build(context);
+    final formKey = GlobalKey<FormState>();
     return Form(
         key: formKey,
         child: DefaultTabController(
@@ -108,290 +183,139 @@ class _AddProductScreenState extends State<AddProductScreen>
             initialIndex: 0,
             child: Scaffold(
                 appBar: AppBar(
-                  automaticallyImplyLeading: false,
-                  backgroundColor: Colors.green.shade900,
-                  elevation: 0,
-                  toolbarHeight: 0,
-                  // bottom: const TabBar(
-                  //     isScrollable: true,
-                  //     indicator: UnderlineTabIndicator(
-                  //         borderSide:
-                  //             BorderSide(width: 4, color: Colors.yellow)),
-                  //     tabs: [
-                  //       Tab(child: Text('General')),
-                  //       Tab(child: Text('Inventory')),
-                  //       Tab(child: Text('Shipping')),
-                  //       Tab(child: Text('Attributes')),
-                  //       Tab(child: Text('Images'))
-                  //     ])
-                ),
+                    automaticallyImplyLeading: false,
+                    backgroundColor: Colors.green.shade900,
+                    elevation: 0,
+                    toolbarHeight: 0),
                 body: ListView(padding: const EdgeInsets.all(10), children: [
                   cardWidget(context, 'GENERAL', [
-                    _services.formField(
+                    _services.formField(productName,
                         label: 'Product Name',
                         inputType: TextInputType.name,
-                        onChanged: (value) => provider.getFormData(
-                            productName: value.toUpperCase())),
-                    _services.formField(
+                        onChanged: (value) => value = productName.text),
+                    _services.formField(description,
                         label: 'Description',
                         inputType: TextInputType.multiline,
                         maxLine: null,
-                        onChanged: (value) =>
-                            provider.getFormData(description: value)),
-                    // _formField(
-                    //     label: 'Brand',
-                    //     inputType: TextInputType.text,
-                    //     onChanged: (value) => provider.getFormData(brand: value)),
-                    _unitDropDown(provider),
-                    _services.formField(
+                        onChanged: (value) => value = description.text),
+                    _unitDropDown(_units),
+                    _services.formField(regularPrice,
                         label: 'Regular price',
                         unit: selectedUnit,
                         inputType: TextInputType.number,
-                        onChanged: (value) => provider.getFormData(
-                            regularPrice: int.parse(value)))
+                        onChanged: (value) => value = regularPrice.text)
                   ]),
-                  // Row(children: [
-                  //   Expanded(
-                  //       child: TextFormField(
-                  //           controller: _sizeText,
-                  //           decoration: const InputDecoration(label: Text('Size')),
-                  //           onChanged: (value) {
-                  //             if (value.isNotEmpty) {
-                  //               setState(() => _entered = true);
-                  //             }
-                  //           })),
-                  //   if (_entered)
-                  //     ElevatedButton(
-                  //         onPressed: () => setState(() {
-                  //               _sizeList.add(_sizeText.text);
-                  //               _sizeText.clear();
-                  //               _entered = false;
-                  //               _saved = false;
-                  //             }),
-                  //         child: const Text('Add'))
-                  // ]),
-                  // if (_sizeList.isNotEmpty)
-                  //   SizedBox(
-                  //       height: 50,
-                  //       child: ListView.builder(
-                  //           shrinkWrap: true,
-                  //           scrollDirection: Axis.horizontal,
-                  //           itemCount: _sizeList.length,
-                  //           itemBuilder: (context, index) {
-                  //             return Padding(
-                  //                 padding: const EdgeInsets.all(8.0),
-                  //                 child: InkWell(
-                  //                     onLongPress: () => setState(() {
-                  //                           _sizeList.removeAt(index);
-                  //                           provider.getFormData(
-                  //                               sizeList: _sizeList);
-                  //                         }),
-                  //                     child: Container(
-                  //                         height: 50,
-                  //                         width: 50,
-                  //                         decoration: BoxDecoration(
-                  //                             borderRadius:
-                  //                                 BorderRadius.circular(4),
-                  //                             color: Colors.purpleAccent),
-                  //                         child: Padding(
-                  //                             padding: const EdgeInsets.all(8.0),
-                  //                             child: Center(
-                  //                                 child: Text(_sizeList[index],
-                  //                                     style: const TextStyle(
-                  //                                         fontWeight: FontWeight
-                  //                                             .bold)))))));
-                  //           })),
-                  // if (_sizeList.isNotEmpty)
-                  //   Column(children: [
-                  //     const Align(
-                  //         alignment: Alignment.centerLeft,
-                  //         child: Text('* long press to delete',
-                  //             style: TextStyle(color: Colors.grey, fontSize: 12))),
-                  //     Row(children: [
-                  //       Expanded(
-                  //           child: ElevatedButton(
-                  //               onPressed: () => setState(() {
-                  //                     provider.getFormData(sizeList: _sizeList);
-                  //                     _saved = true;
-                  //                   }),
-                  //               child: Text(
-                  //                   _saved == true ? 'Saved' : 'Press to Save')))
-                  //     ])
-                  //   ]),
-                  cardWidget(context, 'CATEGORY', [
-                    _categoryDropDown(provider),
-                    _mainCategoryDropDown(provider)
-                    // Padding(
-                    //     padding: const EdgeInsets.only(top: 20, bottom: 10),
-                    //     child: Row(
-                    //         mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    //         children: [
-                    //           Text(
-                    //               provider.productData!['mainCategory'] ??
-                    //                   'Select Main Category',
-                    //               style: TextStyle(
-                    //                   fontSize: 16, color: Colors.grey.shade700)),
-                    //           if (selectedCategory != null)
-                    //             InkWell(
-                    //                 onTap: () => showDialog(
-                    //                         context: context,
-                    //                         builder: (_) => MainCategoryList(
-                    //                             selectedCategory: selectedCategory,
-                    //                             provider: provider))
-                    //                     .whenComplete(() => setState(() {})),
-                    //                 child: const Icon(Icons.arrow_drop_down))
-                    //         ]))
-                  ]),
-                  // _formField(
-                  //     label: 'Add other details',
-                  //     maxLine: 2,
-                  //     onChanged: (value) =>
-                  //         provider.getFormData(otherDetails: value)),
-                  // Padding(
-                  //     padding: const EdgeInsets.only(top: 20, bottom: 10),
-                  //     child: Row(
-                  //         mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  //         children: [
-                  //           Text(
-                  //               provider.productData!['mainCategory'] ??
-                  //                   'Select Main Category',
-                  //               style: TextStyle(
-                  //                   fontSize: 16, color: Colors.grey.shade700)),
-                  //           if (selectedCategory != null)
-                  //             InkWell(
-                  //                 onTap: () => showDialog(
-                  //                         context: context,
-                  //                         builder: (context) => MainCategoryList(
-                  //                             selectedCategory: selectedCategory,
-                  //                             provider: provider))
-                  //                     .whenComplete(() => setState(() {})),
-                  //                 child: const Icon(Icons.arrow_drop_down))
-                  //         ])),
+                  cardWidget(context, 'CATEGORY', [buildCategoryDropdown()]),
                   cardWidget(context, 'INVENTORY', [
                     CheckboxListTile(
                         title: const Text('Manage Inventory? '),
                         value: _manageInventory,
                         onChanged: (value) {
-                          setState(() {
-                            _manageInventory = value;
-                            provider.getFormData(manageInventory: value);
-                          });
+                          setState(() => _manageInventory = value);
                         }),
                     if (_manageInventory == true)
                       Column(children: [
-                        _services.formField(
+                        _services.formField(stockOnHand,
                             label: 'Stock on hand',
                             inputType: TextInputType.number,
-                            onChanged: (value) =>
-                                provider.getFormData(soh: int.parse(value)))
+                            onChanged: (value) => value = stockOnHand.text)
                       ])
                   ]),
                   cardWidget(context, 'SHIPPING', [
                     CheckboxListTile(
                         title: const Text('Charge Transport fee?'),
                         value: _chargeShipping,
-                        onChanged: (value) => setState(() {
-                              _chargeShipping = value;
-                              provider.getFormData(chargeShipping: value);
-                            })),
+                        onChanged: (value) =>
+                            setState(() => _chargeShipping = value)),
                     if (_chargeShipping == true)
-                      _services.formField(
+                      _services.formField(shippingCharge,
                           label: 'Transport Charge',
                           inputType: TextInputType.number,
-                          onChanged: (value) {
-                            provider.getFormData(
-                                shippingCharge: int.parse(value));
-                          })
+                          onChanged: (value) => value = shippingCharge.text)
                   ]),
                   cardWidget(context, 'PRODUCT IMAGE', [
                     ElevatedButton(
-                        child: const Text('Add'),
-                        onPressed: () => _pickImage().then((value) => value!
-                            .forEach((image) =>
-                                setState(() => provider.getImageFile(image))))),
-                    Center(
-                        child: GridView.builder(
-                            shrinkWrap: true,
-                            physics: const ScrollPhysics(),
-                            itemCount: provider.imageFiles!.length,
-                            gridDelegate:
-                                SliverGridDelegateWithFixedCrossAxisCount(
-                                    crossAxisCount:
-                                        provider.imageFiles!.length >= 4
-                                            ? 4
-                                            : provider.imageFiles!.isEmpty
-                                                ? 1
-                                                : provider.imageFiles!.length),
-                            itemBuilder: (context, index) => Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: Stack(children: [
-                                  Image.file(
-                                      File(provider.imageFiles![index].path),
-                                      fit: BoxFit.cover),
-                                  Positioned(
-                                      top: 0,
-                                      right: 0,
-                                      child: GestureDetector(
-                                          onTap: () => setState(() => provider
-                                              .imageFiles!
-                                              .removeAt(index)),
-                                          child: Container(
-                                              decoration: const BoxDecoration(
-                                                  shape: BoxShape.circle,
-                                                  color: Colors.red),
-                                              child: const Icon(Icons.close,
-                                                  color: Colors.white))))
-                                ]))))
+                        child: const Text('Add image'),
+                        onPressed: () => _pickAndUploadImage()),
+                    const SizedBox(height: 10),
+                    _downloadURL == null
+                        ? Container()
+                        : SizedBox(
+                            height: 200,
+                            width: 200,
+                            child: Stack(children: [
+                              ClipRRect(
+                                  borderRadius: BorderRadius.circular(5),
+                                  child: Image.file(File(_pickedImage!.path),
+                                      fit: BoxFit.cover)),
+                              Positioned(
+                                  top: 10,
+                                  right: 10,
+                                  child: GestureDetector(
+                                      onTap: _cancelImageSelection,
+                                      child: const Icon(Icons.close,
+                                          color: Colors.white, size: 24)))
+                            ]))
                   ])
                 ]),
-                // body: const TabBarView(children: [
-                //   GeneralTab(),
-                //   InventoryTab(),
-                //   ShippingTab(),
-                //   AttributeTab(),
-                //   ImagesTab()
-                // ]),
                 persistentFooterButtons: [
                   Center(
                       child: ElevatedButton(
                           style: ElevatedButton.styleFrom(
                               backgroundColor: Colors.green.shade900),
                           onPressed: () {
-                            if (provider.imageFiles!.isEmpty) {
+                            if (_downloadURL == '') {
                               _services.scaffold(context, 'Image not selected');
                               return;
                             }
                             if (formKey.currentState!.validate()) {
-                              EasyLoading.show(status: 'Please wait..');
-
-                              // provider.getFormData(seller: {
-                              //   'name': vendor.vendor!.businessName,
-                              //   'uid': services.user!.uid,
-                              //   'logo': vendor.vendor!.logo
-                              // });
-                              // services
-                              //     .uploadFiles(
-                              //         images: provider.imageFiles,
-                              //         ref:
-                              //             'products/${vendor.vendor!.businessName}/${provider.productData!['productName']}',
-                              //         provider: provider)
-                              //     .then((value) {
-                              //   if (value.isNotEmpty) {
-                              //     services
-                              //         .saveToDb(
-                              //             data: provider.productData, context: context)
-                              //         .then((value) {
-                              //       EasyLoading.dismiss();
-                              //       setState() {
-                              //         provider.clearProductData();
-                              //       }
-                              //     });
-                              //   }
-                              // });
+                              final productsCollection = FirebaseFirestore
+                                  .instance
+                                  .collection('products');
+                              final docID = productsCollection.doc().id;
+                              productsCollection
+                                  .doc(docID)
+                                  .set({
+                                    'category': selectedCategory,
+                                    'description': description.text,
+                                    'imageURL': _downloadURL,
+                                    'isInventoryManaged': _manageInventory,
+                                    'isShipCharged': _chargeShipping,
+                                    'productID': docID,
+                                    'productName': productName.text,
+                                    'regularPrice':
+                                        double.parse(regularPrice.text),
+                                    'shippingCharge':
+                                        double.parse(shippingCharge.text),
+                                    'stockOnHand': int.parse(stockOnHand.text),
+                                    'unit': extractUnitText(selectedUnit!),
+                                    'vendorID':
+                                        FirebaseAuth.instance.currentUser!.uid
+                                  })
+                                  .then((value) => showDialog(
+                                      context: context,
+                                      builder: (_) => successDialog(context,
+                                          'Product successfully added!')))
+                                  .then((value) => clearAll());
                             }
                           },
                           child: const Text('Save Product')))
                 ])));
+  }
+
+  clearAll() {
+    setState(() {
+      selectedCategory = '';
+      description.text = '';
+      _downloadURL = null;
+      _manageInventory = false;
+      _chargeShipping = false;
+      productName.text = '';
+      regularPrice.text = '';
+      shippingCharge.text = '';
+      stockOnHand.text = '';
+      selectedUnit = '';
+    });
   }
 
   Widget _formField(
@@ -409,7 +333,7 @@ class _AddProductScreenState extends State<AddProductScreen>
               minLines: minLine,
               maxLines: null));
 
-  Widget _unitDropDown(ProductProvider provider) => Padding(
+  Widget _unitDropDown(units) => Padding(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
       child: DropdownButtonFormField(
           decoration: const InputDecoration(border: OutlineInputBorder()),
@@ -420,10 +344,7 @@ class _AddProductScreenState extends State<AddProductScreen>
           icon: const Icon(Icons.arrow_drop_down),
           elevation: 16,
           onChanged: (String? newValue) {
-            // setState(() {
             selectedUnit = newValue!;
-            provider.getFormData(unit: newValue);
-            // });
           },
           items: _units
               .map<DropdownMenuItem<String>>((String value) =>
@@ -434,42 +355,6 @@ class _AddProductScreenState extends State<AddProductScreen>
                               fontFamily: 'Lato', fontSize: 12))))
               .toList(),
           validator: (value) => value!.isEmpty ? 'Select unit' : null));
-
-  Widget _categoryDropDown(ProductProvider provider) => Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-      child: DropdownButtonFormField<String>(
-          decoration: const InputDecoration(border: OutlineInputBorder()),
-          value: selectedCategory,
-          hint: const Text('Category'),
-          icon: const Icon(Icons.arrow_drop_down),
-          elevation: 16,
-          onChanged: (String? newValue) => setState(() {
-                selectedCategory = newValue!;
-                provider.getFormData(category: newValue);
-              }),
-          items: _categories
-              .map<DropdownMenuItem<String>>((String value) =>
-                  DropdownMenuItem<String>(value: value, child: Text(value)))
-              .toList(),
-          validator: (value) => value!.isEmpty ? 'Select Category' : null));
-
-  Widget _mainCategoryDropDown(ProductProvider provider) => Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-      child: DropdownButtonFormField<String>(
-          decoration: const InputDecoration(border: OutlineInputBorder()),
-          value: selectedCategory,
-          hint: const Text('Main Category'),
-          icon: const Icon(Icons.arrow_drop_down),
-          elevation: 16,
-          onChanged: (String? newValue) => setState(() {
-                selectedCategory = newValue!;
-                provider.getFormData(category: newValue);
-              }),
-          items: _categories
-              .map<DropdownMenuItem<String>>((String value) =>
-                  DropdownMenuItem<String>(value: value, child: Text(value)))
-              .toList(),
-          validator: (value) => value!.isEmpty ? 'Select Category' : null));
 
   Widget cardWidget(context, String title, List<Widget> contents) => Card(
       shape: RoundedRectangleBorder(

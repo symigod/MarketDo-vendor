@@ -30,9 +30,20 @@ String dateTimeToString(Timestamp timestamp) =>
 
 String numberToString(double number) => NumberFormat('#, ###').format(number);
 
-String unitAbbreviation(String selectedValue) {
+String unitAbbreviation(String? selectedValue) {
   RegExp regex = RegExp(r'\((.*?)\)');
-  Match? match = regex.firstMatch(selectedValue);
+  Match? match = regex.firstMatch(selectedValue!);
   String abbreviation = match?.group(1) ?? '';
   return abbreviation;
+}
+
+String extractUnitText(String? selectedUnit) {
+  if (selectedUnit != null) {
+    int startIndex = selectedUnit.indexOf('(');
+    int endIndex = selectedUnit.indexOf(')');
+    if (startIndex != -1 && endIndex != -1 && endIndex > startIndex) {
+      return selectedUnit.substring(startIndex + 1, endIndex);
+    }
+  }
+  return '';
 }
