@@ -2,6 +2,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
 class CategoriesDropdown extends StatefulWidget {
+  const CategoriesDropdown({super.key});
+
   @override
   _CategoriesDropdownState createState() => _CategoriesDropdownState();
 }
@@ -20,9 +22,9 @@ class _CategoriesDropdownState extends State<CategoriesDropdown> {
     QuerySnapshot snapshot =
         await FirebaseFirestore.instance.collection('categories').get();
     List<String> fetchedCategories = [];
-    snapshot.docs.forEach((doc) {
+    for (var doc in snapshot.docs) {
       fetchedCategories.add(doc['category']);
-    });
+    }
     setState(() => categories = fetchedCategories);
   }
 

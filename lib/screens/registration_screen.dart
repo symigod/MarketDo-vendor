@@ -1,6 +1,4 @@
 import 'dart:io';
-import 'package:csc_picker/csc_picker.dart';
-import 'package:email_validator/email_validator.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
@@ -22,12 +20,8 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
   final _formKey = GlobalKey<FormState>();
   final _businessName = TextEditingController();
   final _contactNumber = TextEditingController();
-  final _email = TextEditingController();
-  final _gstNumber = TextEditingController();
-  final _pinCode = TextEditingController();
+  final _address = TextEditingController();
   final _landMark = TextEditingController();
-  String? _bName;
-  String? _taxStatus;
   XFile? _shopImage;
   String? _shopImageUrl;
   XFile? _logo;
@@ -43,18 +37,16 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
           String? label,
           TextInputType? type,
           String? Function(String?)? validator}) =>
-      TextFormField(
-          controller: controller,
-          keyboardType: type,
-          decoration: InputDecoration(
-              labelText: label,
-              prefixText: controller == _contactNumber ? '+63' : null),
-          validator: validator,
-          onChanged: (value) {
-            if (controller == _businessName) {
-              setState(() => _bName = value);
-            }
-          });
+      Padding(
+          padding: const EdgeInsets.symmetric(vertical: 5),
+          child: TextFormField(
+              controller: controller,
+              keyboardType: type,
+              decoration: InputDecoration(
+                  border: const OutlineInputBorder(),
+                  labelText: label,
+                  prefixText: controller == _contactNumber ? '+63' : null),
+              validator: validator));
 
   Future<XFile?> _pickImage() async =>
       await _picker.pickImage(source: ImageSource.gallery);
@@ -81,10 +73,6 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
 
     if (_formKey.currentState!.validate()) {
       {
-        if (countryValue == null || stateValue == null || cityValue == null) {
-          _scaffold('Select address field completely');
-          return;
-        }
         EasyLoading.show(status: 'Please wait...');
         _services
             .uploadImage(
@@ -99,22 +87,15 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                     .then((url) => setState(() => _logoUrl = url))
                     .then((value) {
                   _services.addVendor(data: {
-                    'approved': false,
+                    'address': _address.text,
                     'businessName': _businessName.text,
-                    'city': cityValue,
-                    'country': countryValue,
-                    'email': _email.text,
+                    'email': FirebaseAuth.instance.currentUser!.email,
                     'isActive': true,
                     'landMark': _landMark.text,
                     'logo': _logoUrl,
                     'mobile': '+63${_contactNumber.text}',
-                    'pinCode': _pinCode.text,
                     'shopImage': _shopImageUrl,
-                    'state': stateValue,
-                    'taxRegistered': _taxStatus,
-                    'time': DateTime.now(),
-                    'tinNumber':
-                        _gstNumber.text.isEmpty ? null : _gstNumber.text,
+                    'registeredOn': DateTime.now(),
                     'vendorID': _services.user!.uid,
                   }).then((value) {
                     EasyLoading.dismiss();
@@ -137,72 +118,71 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
               child: Column(children: [
             SizedBox(
                 height: 240,
-                child: Stack(children: [
+                child: Stack(alignment: Alignment.center, children: [
                   _shopImage == null
-                      ? Container(
-                          color: Colors.greenAccent,
-                          height: 240,
-                          child: TextButton(
-                              child: Center(
-                                  child: Text('Tap to add shop image',
-                                      style: TextStyle(
-                                          color: Colors.grey.shade800))),
-                              onPressed: () => _pickImage().then((value) =>
-                                  setState(() => _shopImage = value))))
+                      ? Container(color: Colors.greenAccent, height: 240)
                       : InkWell(
                           onTap: () => _pickImage().then(
                               (value) => setState(() => _shopImage = value)),
                           child: Container(
+                              padding: const EdgeInsets.all(20),
                               height: 240,
                               decoration: BoxDecoration(
-                                  color: Colors.greenAccent,
                                   image: DecorationImage(
-                                      opacity: 100,
                                       image: FileImage(File(_shopImage!.path)),
                                       fit: BoxFit.cover)))),
-                  SizedBox(
-                      height: 80,
-                      child: AppBar(
-                          backgroundColor: Colors.transparent,
-                          elevation: 0,
-                          actions: [
-                            IconButton(
-                                onPressed: () =>
-                                    FirebaseAuth.instance.signOut(),
-                                icon: const Icon(Icons.exit_to_app))
-                          ])),
-                  Align(
-                      alignment: Alignment.bottomCenter,
-                      child: Padding(
-                          padding: const EdgeInsets.all(20.0),
-                          child: Row(
-                              crossAxisAlignment: CrossAxisAlignment.end,
-                              children: [
-                                InkWell(
-                                    onTap: () => _pickImage().then((value) =>
-                                        setState(() => _logo = value)),
-                                    child: Card(
-                                        elevation: 4,
-                                        child: _logo == null
-                                            ? const SizedBox(
-                                                height: 50,
-                                                width: 50,
-                                                child: Center(child: Text('+')))
-                                            : ClipRRect(
-                                                borderRadius:
-                                                    BorderRadius.circular(4),
-                                                child: SizedBox(
-                                                    height: 50,
-                                                    width: 50,
-                                                    child: Image.file(
-                                                        File(_logo!.path)))))),
-                                const SizedBox(width: 10),
-                                Text(_bName == null ? '' : _bName!,
-                                    style: const TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.white,
-                                        fontSize: 20))
-                              ])))
+                  Row(children: [
+                    const SizedBox(width: 20),
+                    Stack(children: [
+                      _logo == null
+                          ? Container(
+                              height: 150,
+                              width: 150,
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                shape: BoxShape.circle,
+                                border:
+                                    Border.all(color: Colors.white, width: 3),
+                              ),
+                              child: const Center(
+                                  child: Text('YOUR PICTURE/BUSINESS LOGO',
+                                      textAlign: TextAlign.center)))
+                          : Container(
+                              height: 150,
+                              width: 150,
+                              decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  border:
+                                      Border.all(color: Colors.white, width: 3),
+                                  image: DecorationImage(
+                                      image: FileImage(File(_logo!.path)),
+                                      fit: BoxFit.cover))),
+                      Positioned(
+                          bottom: 0,
+                          right: 0,
+                          child: GestureDetector(
+                              onTap: () => _pickImage().then(
+                                  (value) => setState(() => _logo = value)),
+                              child: Container(
+                                  decoration: const BoxDecoration(
+                                      color: Colors.blue,
+                                      shape: BoxShape.circle),
+                                  padding: const EdgeInsets.all(8),
+                                  child: const Icon(Icons.camera_alt,
+                                      color: Colors.white))))
+                    ])
+                  ]),
+                  Positioned(
+                      bottom: 10,
+                      right: 10,
+                      child: TextButton(
+                          style: TextButton.styleFrom(
+                              backgroundColor: Colors.white.withOpacity(0.8)),
+                          onPressed: () => _pickImage().then(
+                              (value) => setState(() => _shopImage = value)),
+                          child: const Text('Edit shop image',
+                              style: TextStyle(
+                                  fontSize: 12, fontWeight: FontWeight.bold))))
                 ])),
             Padding(
                 padding: const EdgeInsets.fromLTRB(30, 8, 30, 8),
@@ -220,103 +200,42 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                       validator: (value) =>
                           value!.isEmpty ? 'Enter Contact Number' : null),
                   _formField(
-                      controller: _email,
-                      label: 'Email Address',
-                      type: TextInputType.emailAddress,
+                      controller: _address,
+                      label: 'Address',
+                      type: TextInputType.text,
                       validator: (value) => value!.isEmpty
-                          ? 'Enter email'
-                          : (EmailValidator.validate(value)) == false
-                              ? 'Invalid Email'
-                              : null),
-                  const SizedBox(height: 10),
-                  Row(children: [
-                    const Text('Tax Registered: '),
-                    Expanded(
-                        child: DropdownButtonFormField(
-                            value: _taxStatus,
-                            validator: (value) =>
-                                value!.isEmpty ? 'Select Tax Status' : null,
-                            hint: const Text('Select'),
-                            items: list
-                                .map<DropdownMenuItem<String>>((String value) =>
-                                    DropdownMenuItem<String>(
-                                        value: value, child: Text(value)))
-                                .toList(),
-                            onChanged: (String? value) =>
-                                setState(() => _taxStatus = value)))
-                  ]),
-                  if (_taxStatus == 'Yes')
-                    _formField(
-                        controller: _gstNumber,
-                        label: 'GST Number',
-                        type: TextInputType.text,
-                        validator: (value) =>
-                            value!.isEmpty ? 'Enter GST Number' : null),
-                  _formField(
-                      controller: _pinCode,
-                      label: 'PIN Code',
-                      type: TextInputType.number,
-                      validator: (value) =>
-                          value!.isEmpty ? 'Enter PIN Code' : null),
+                          ? 'Enter your complete address'
+                          : null),
                   _formField(
                       controller: _landMark,
                       label: 'Landmark',
                       type: TextInputType.text,
                       validator: (value) =>
                           value!.isEmpty ? 'Enter a Landmark' : null),
+                  // _formField(
+                  //     controller: _pinCode,
+                  //     label: 'PIN Code',
+                  //     type: TextInputType.number,
+                  //     validator: (value) =>
+                  //         value!.isEmpty ? 'Enter PIN Code' : null),
                   const SizedBox(height: 10),
-                  CSCPicker(
-                      showStates: true,
-                      showCities: true,
-                      flagState: CountryFlag.DISABLE,
-                      dropdownDecoration: BoxDecoration(
-                          borderRadius:
-                              const BorderRadius.all(Radius.circular(10)),
-                          color: Colors.white,
-                          border: Border.all(
-                              color: Colors.grey.shade300, width: 1)),
-                      disabledDropdownDecoration: BoxDecoration(
-                          borderRadius:
-                              const BorderRadius.all(Radius.circular(10)),
-                          border: Border.all(
-                              color: Colors.grey.shade300, width: 1)),
-                      countrySearchPlaceholder: "Country",
-                      stateSearchPlaceholder: "State",
-                      citySearchPlaceholder: "City",
-                      countryDropdownLabel: "*Country",
-                      stateDropdownLabel: "*State",
-                      cityDropdownLabel: "*City",
-                      defaultCountry: CscCountry.Philippines,
-                      countryFilter: const [
-                        CscCountry.Philippines,
-                        CscCountry.United_States,
-                        CscCountry.Canada
-                      ],
-                      selectedItemStyle:
-                          const TextStyle(color: Colors.black, fontSize: 14),
-                      dropdownHeadingStyle: const TextStyle(
-                          color: Colors.black,
-                          fontSize: 17,
-                          fontWeight: FontWeight.bold),
-                      dropdownItemStyle:
-                          const TextStyle(color: Colors.black, fontSize: 14),
-                      dropdownDialogRadius: 10.0,
-                      searchBarRadius: 10.0,
-                      onCountryChanged: (value) =>
-                          setState(() => countryValue = value),
-                      onStateChanged: (value) =>
-                          setState(() => stateValue = value),
-                      onCityChanged: (value) =>
-                          setState(() => cityValue = value))
                 ]))
           ])),
           persistentFooterButtons: [
-            Row(children: [
-              Expanded(
-                  child: Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: ElevatedButton(
-                          onPressed: _saveToDB, child: const Text('Register'))))
+            Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
+              Container(
+                  width: 120,
+                  padding: const EdgeInsets.all(10),
+                  child: ElevatedButton(
+                      style: TextButton.styleFrom(
+                          backgroundColor: Colors.red.shade900),
+                      onPressed: () => FirebaseAuth.instance.signOut(),
+                      child: const Text('Cancel'))),
+              Container(
+                  width: 120,
+                  padding: const EdgeInsets.all(10),
+                  child: ElevatedButton(
+                      onPressed: _saveToDB, child: const Text('Register')))
             ])
           ]));
 }

@@ -21,7 +21,7 @@ class _CustomDrawerState extends State<CustomDrawer> {
   _updateStatus(bool value) async {
     if (firebaseUser != null) {
       final vendorDoc = FirebaseFirestore.instance
-          .collection('vendor')
+          .collection('vendors')
           .doc(firebaseUser!.uid);
       final docSnapshot = await vendorDoc.get();
       if (docSnapshot.exists && context.mounted) {
@@ -37,7 +37,7 @@ class _CustomDrawerState extends State<CustomDrawer> {
 
   Future<VendorModel> fetchData() async {
     DocumentSnapshot snapshot = await FirebaseFirestore.instance
-        .collection('vendor')
+        .collection('vendors')
         .doc(firebaseUser!.uid)
         .get();
     return VendorModel.fromFirestore(snapshot);
@@ -121,8 +121,7 @@ class _CustomDrawerState extends State<CustomDrawer> {
                     ListTile(
                         dense: true,
                         leading: const Icon(Icons.location_on),
-                        title: Text(
-                            '${vendor.city}, ${vendor.state}, ${vendor.country}'),
+                        title: Text('${vendor.address}'),
                         subtitle: Text(vendor.landMark)),
                     ListTile(
                         dense: true,

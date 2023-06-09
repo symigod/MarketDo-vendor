@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:marketdo_app_vendor/screens/add_product_screen.dart';
 import 'package:marketdo_app_vendor/screens/login_screen.dart';
 import 'package:marketdo_app_vendor/screens/order_screen/order_screen.dart';
 import 'package:marketdo_app_vendor/screens/product_screen.dart';
@@ -42,13 +43,16 @@ class _MainScreenState extends State<MainScreen> {
               ]),
           drawer: const CustomDrawer(),
           body: screens[currentScreen],
-          // floatingActionButtonLocation: FloatingActionButtonLocation.endDocked,
-          // floatingActionButton: FloatingActionButton(
-          //     onPressed: () => Navigator.push(context,
-          //         MaterialPageRoute(builder: (_) => const AddProductScreen())),
-          //     backgroundColor: Colors.green.shade900,
-          //     child: const Icon(Icons.add_business)),
+          floatingActionButtonLocation:
+              FloatingActionButtonLocation.miniEndFloat,
+          floatingActionButton: FloatingActionButton(
+              mini: true,
+              onPressed: () => Navigator.push(context,
+                  MaterialPageRoute(builder: (_) => const AddProductScreen())),
+              backgroundColor: Colors.green.shade900,
+              child: const Icon(Icons.add)),
           bottomNavigationBar: BottomNavigationBar(
+              elevation: 0,
               backgroundColor: Colors.green.shade900,
               currentIndex: currentScreen,
               onTap: (int index) => setState(() => currentScreen = index),

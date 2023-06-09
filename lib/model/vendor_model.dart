@@ -3,9 +3,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class VendorModel {
+  final address;
   final businessName;
-  final city;
-  final country;
   final email;
   final isActive;
   final isApproved;
@@ -15,15 +14,13 @@ class VendorModel {
   final mobile;
   final pinCode;
   final shopImage;
-  final state;
   final registeredOn;
   final tin;
   final vendorID;
 
   VendorModel({
+    required this.address,
     required this.businessName,
-    required this.city,
-    required this.country,
     required this.email,
     required this.isActive,
     required this.isApproved,
@@ -33,7 +30,6 @@ class VendorModel {
     required this.mobile,
     required this.pinCode,
     required this.shopImage,
-    required this.state,
     required this.registeredOn,
     required this.tin,
     required this.vendorID,
@@ -42,9 +38,8 @@ class VendorModel {
   factory VendorModel.fromFirestore(DocumentSnapshot doc) {
     Map<String, dynamic> data = (doc.data() as Map<String, dynamic>);
     return VendorModel(
+      address: data['address'],
       businessName: data['businessName'],
-      city: data['city'],
-      country: data['country'],
       email: data['email'],
       isActive: data['isActive'],
       isApproved: data['isApproved'],
@@ -54,7 +49,6 @@ class VendorModel {
       mobile: data['mobile'],
       pinCode: data['pinCode'],
       shopImage: data['shopImage'],
-      state: data['state'],
       registeredOn: data['registeredOn'],
       tin: data['tin'],
       vendorID: data['vendorID'],
@@ -62,9 +56,8 @@ class VendorModel {
   }
 
   Map<String, dynamic> toFirestore() => {
+        'address': address,
         'businessName': businessName,
-        'city': city,
-        'country': country,
         'email': email,
         'isActive': isActive,
         'isApproved': isApproved,
@@ -74,7 +67,6 @@ class VendorModel {
         'mobile': mobile,
         'pinCode': pinCode,
         'shopImage': shopImage,
-        'state': state,
         'registeredOn': registeredOn,
         'tin': tin,
         'vendorID': vendorID,

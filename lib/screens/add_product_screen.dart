@@ -70,8 +70,6 @@ class _AddProductScreenState extends State<AddProductScreen>
 
   // Future<List<XFile>?> _pickImage() async => await _picker.pickMultiImage();
   final List<String> _units = [];
-  bool? _manageInventory = false;
-  bool? _chargeShipping = false;
 
   TextEditingController productName = TextEditingController();
   TextEditingController description = TextEditingController();
@@ -124,14 +122,10 @@ class _AddProductScreenState extends State<AddProductScreen>
           .orderBy('category')
           .get();
       List<String> fetchedCategories = [];
-      snapshot.docs.forEach((doc) {
+      for (var doc in snapshot.docs) {
         fetchedCategories.add(doc['category']);
-      });
-
-      setState(() {
-        categories = fetchedCategories;
-        selectedCategory = (categories.isNotEmpty ? categories[0] : null)!;
-      });
+      }
+      setState(() => categories.addAll(fetchedCategories));
     } catch (error) {
       print('Error fetching categories: $error');
     }
@@ -152,18 +146,20 @@ class _AddProductScreenState extends State<AddProductScreen>
 
   @override
   Widget build(BuildContext context) {
-    Widget buildCategoryDropdown() {
+    Widget categoryDropdown(categories) {
       if (categories.isEmpty) {
         return loadingWidget();
       } else {
         return Padding(
-            padding: const EdgeInsets.all(10),
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
             child: DropdownButtonFormField<String>(
                 dropdownColor: Colors.yellow,
                 decoration: const InputDecoration(border: OutlineInputBorder()),
                 value: selectedCategory,
                 hint: const Text('Select category'),
-                onChanged: (newValue) =>
+                icon: const Icon(Icons.arrow_drop_down),
+                elevation: 16,
+                onChanged: (String? newValue) =>
                     setState(() => selectedCategory = newValue!),
                 items: categories.map<DropdownMenuItem<String>>((String value) {
                   return DropdownMenuItem<String>(
@@ -174,133 +170,118 @@ class _AddProductScreenState extends State<AddProductScreen>
       }
     }
 
+    Widget unitDropDown(units) => Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+        child: DropdownButtonFormField(
+            decoration: const InputDecoration(border: OutlineInputBorder()),
+            dropdownColor: Colors.yellow,
+            menuMaxHeight: 300,
+            value: selectedUnit,
+            hint: const Text('Select Unit'),
+            icon: const Icon(Icons.arrow_drop_down),
+            elevation: 16,
+            onChanged: (String? newValue) => selectedUnit = newValue!,
+            items: _units
+                .map<DropdownMenuItem<String>>((String value) =>
+                    DropdownMenuItem<String>(value: value, child: Text(value)))
+                .toList(),
+            validator: (value) => value!.isEmpty ? 'Select unit' : null));
+
     super.build(context);
     final formKey = GlobalKey<FormState>();
     return Form(
         key: formKey,
-        child: DefaultTabController(
-            length: 5,
-            initialIndex: 0,
-            child: Scaffold(
-                appBar: AppBar(
-                    automaticallyImplyLeading: false,
-                    backgroundColor: Colors.green.shade900,
-                    elevation: 0,
-                    toolbarHeight: 0),
-                body: ListView(padding: const EdgeInsets.all(10), children: [
-                  cardWidget(context, 'GENERAL', [
-                    _services.formField(productName,
-                        label: 'Product Name',
-                        inputType: TextInputType.name,
-                        onChanged: (value) => value = productName.text),
-                    _services.formField(description,
-                        label: 'Description',
-                        inputType: TextInputType.multiline,
-                        maxLine: null,
-                        onChanged: (value) => value = description.text),
-                    _unitDropDown(_units),
-                    _services.formField(regularPrice,
-                        label: 'Regular price',
-                        unit: selectedUnit,
-                        inputType: TextInputType.number,
-                        onChanged: (value) => value = regularPrice.text)
-                  ]),
-                  cardWidget(context, 'CATEGORY', [buildCategoryDropdown()]),
-                  cardWidget(context, 'INVENTORY', [
-                    CheckboxListTile(
-                        title: const Text('Manage Inventory? '),
-                        value: _manageInventory,
-                        onChanged: (value) {
-                          setState(() => _manageInventory = value);
-                        }),
-                    if (_manageInventory == true)
-                      Column(children: [
-                        _services.formField(stockOnHand,
-                            label: 'Stock on hand',
-                            inputType: TextInputType.number,
-                            onChanged: (value) => value = stockOnHand.text)
-                      ])
-                  ]),
-                  cardWidget(context, 'SHIPPING', [
-                    CheckboxListTile(
-                        title: const Text('Charge Transport fee?'),
-                        value: _chargeShipping,
-                        onChanged: (value) =>
-                            setState(() => _chargeShipping = value)),
-                    if (_chargeShipping == true)
-                      _services.formField(shippingCharge,
-                          label: 'Transport Charge',
-                          inputType: TextInputType.number,
-                          onChanged: (value) => value = shippingCharge.text)
-                  ]),
-                  cardWidget(context, 'PRODUCT IMAGE', [
-                    ElevatedButton(
-                        child: const Text('Add image'),
-                        onPressed: () => _pickAndUploadImage()),
-                    const SizedBox(height: 10),
-                    _downloadURL == null
-                        ? Container()
-                        : SizedBox(
-                            height: 200,
-                            width: 200,
-                            child: Stack(children: [
-                              ClipRRect(
-                                  borderRadius: BorderRadius.circular(5),
-                                  child: Image.file(File(_pickedImage!.path),
-                                      fit: BoxFit.cover)),
-                              Positioned(
-                                  top: 10,
-                                  right: 10,
-                                  child: GestureDetector(
-                                      onTap: _cancelImageSelection,
-                                      child: const Icon(Icons.close,
-                                          color: Colors.white, size: 24)))
-                            ]))
-                  ])
-                ]),
-                persistentFooterButtons: [
-                  Center(
-                      child: ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.green.shade900),
-                          onPressed: () {
-                            if (_downloadURL == '') {
-                              _services.scaffold(context, 'Image not selected');
-                              return;
-                            }
-                            if (formKey.currentState!.validate()) {
-                              final productsCollection = FirebaseFirestore
-                                  .instance
-                                  .collection('products');
-                              final docID = productsCollection.doc().id;
-                              productsCollection
-                                  .doc(docID)
-                                  .set({
-                                    'category': selectedCategory,
-                                    'description': description.text,
-                                    'imageURL': _downloadURL,
-                                    'isInventoryManaged': _manageInventory,
-                                    'isShipCharged': _chargeShipping,
-                                    'productID': docID,
-                                    'productName': productName.text,
-                                    'regularPrice':
-                                        double.parse(regularPrice.text),
-                                    'shippingCharge':
-                                        double.parse(shippingCharge.text),
-                                    'stockOnHand': int.parse(stockOnHand.text),
-                                    'unit': extractUnitText(selectedUnit!),
-                                    'vendorID':
-                                        FirebaseAuth.instance.currentUser!.uid
-                                  })
-                                  .then((value) => showDialog(
-                                      context: context,
-                                      builder: (_) => successDialog(context,
-                                          'Product successfully added!')))
-                                  .then((value) => clearAll());
-                            }
-                          },
-                          child: const Text('Save Product')))
-                ])));
+        child: Scaffold(
+            appBar: AppBar(title: const Text('Add new product')),
+            body: ListView(padding: const EdgeInsets.all(10), children: [
+              _downloadURL == null && _isImageSelected == false
+                  ? SizedBox(
+                      height: 200,
+                      width: 200,
+                      child: Card(
+                        child: Center(
+                            child: ElevatedButton(
+                                child: const Text('Add image'),
+                                onPressed: () => _pickAndUploadImage())),
+                      ))
+                  : SizedBox(
+                      width: MediaQuery.of(context).size.width,
+                      child: Stack(alignment: Alignment.center, children: [
+                        ClipRRect(
+                            borderRadius: BorderRadius.circular(5),
+                            child: Image.file(File(_pickedImage!.path),
+                                fit: BoxFit.cover)),
+                        Center(
+                            child: TextButton(
+                                style: TextButton.styleFrom(
+                                  backgroundColor:
+                                      Colors.white.withOpacity(0.5),
+                                ),
+                                child: const Text('CHANGE'),
+                                onPressed: () => _pickAndUploadImage()))
+                      ])),
+              _services.formField(productName,
+                  label: 'Product Name',
+                  inputType: TextInputType.name,
+                  onChanged: (value) => value = productName.text),
+              _services.formField(description,
+                  label: 'Description',
+                  inputType: TextInputType.multiline,
+                  maxLine: null,
+                  onChanged: (value) => value = description.text),
+              categoryDropdown(categories),
+              unitDropDown(_units),
+              _services.formField(regularPrice,
+                  label: 'Regular price',
+                  unit: selectedUnit,
+                  inputType: TextInputType.number,
+                  onChanged: (value) => value = regularPrice.text),
+              _services.formField(shippingCharge,
+                  label: 'Delivery Fee',
+                  inputType: TextInputType.number,
+                  onChanged: (value) => value = shippingCharge.text),
+              _services.formField(stockOnHand,
+                  label: 'Stock on hand',
+                  inputType: TextInputType.number,
+                  onChanged: (value) => value = stockOnHand.text)
+            ]),
+            persistentFooterButtons: [
+              Center(
+                  child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.green.shade900),
+                      onPressed: () {
+                        if (_downloadURL == '') {
+                          _services.scaffold(context, 'Image not selected');
+                          return;
+                        }
+                        if (formKey.currentState!.validate()) {
+                          final productsCollection =
+                              FirebaseFirestore.instance.collection('products');
+                          final docID = productsCollection.doc().id;
+                          productsCollection.doc(docID).set({
+                            'category': selectedCategory,
+                            'description': description.text,
+                            'imageURL': _downloadURL,
+                            'productID': docID,
+                            'productName': productName.text.toUpperCase(),
+                            'regularPrice': double.parse(regularPrice.text),
+                            'shippingCharge': double.parse(shippingCharge.text),
+                            'stockOnHand': int.parse(stockOnHand.text),
+                            'unit': extractUnitText(selectedUnit!),
+                            'vendorID': FirebaseAuth.instance.currentUser!.uid
+                          }).then((value) {
+                            Navigator.pop(context);
+                            return showDialog(
+                                    context: context,
+                                    builder: (_) => successDialog(
+                                        context, 'Product successfully added!'))
+                                .then((value) => Navigator.pop(context));
+                          }).then((value) => clearAll());
+                        }
+                      },
+                      child: const Text('Save Product')))
+            ]));
   }
 
   clearAll() {
@@ -308,8 +289,7 @@ class _AddProductScreenState extends State<AddProductScreen>
       selectedCategory = '';
       description.text = '';
       _downloadURL = null;
-      _manageInventory = false;
-      _chargeShipping = false;
+      _isImageSelected = false;
       productName.text = '';
       regularPrice.text = '';
       shippingCharge.text = '';
@@ -332,29 +312,6 @@ class _AddProductScreenState extends State<AddProductScreen>
               onChanged: onChanged,
               minLines: minLine,
               maxLines: null));
-
-  Widget _unitDropDown(units) => Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-      child: DropdownButtonFormField(
-          decoration: const InputDecoration(border: OutlineInputBorder()),
-          dropdownColor: Colors.yellow,
-          menuMaxHeight: 300,
-          value: selectedUnit,
-          hint: const Text('Select Unit'),
-          icon: const Icon(Icons.arrow_drop_down),
-          elevation: 16,
-          onChanged: (String? newValue) {
-            selectedUnit = newValue!;
-          },
-          items: _units
-              .map<DropdownMenuItem<String>>((String value) =>
-                  DropdownMenuItem<String>(
-                      value: value,
-                      child: Text(value,
-                          style: const TextStyle(
-                              fontFamily: 'Lato', fontSize: 12))))
-              .toList(),
-          validator: (value) => value!.isEmpty ? 'Select unit' : null));
 
   Widget cardWidget(context, String title, List<Widget> contents) => Card(
       shape: RoundedRectangleBorder(

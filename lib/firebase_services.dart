@@ -79,13 +79,14 @@ class FirebaseServices {
                   border: const OutlineInputBorder(),
                   label: Text(label!),
                   prefixText:
-                      label == 'Regular price' || label == 'Transport Charge'
+                      label == 'Regular price' || label == 'Delivery Fee'
                           ? 'PHP '
                           : null,
                   suffixText: label == 'Regular price' && unit != null
                       ? ' per ${unitAbbreviation(unit)}'
                       : null),
-              validator: (value) => value!.isEmpty ? label : null,
+              validator: (value) =>
+                  value == null ? 'This field is required' : null,
               onChanged: onChanged,
               minLines: minLine,
               maxLines: null));

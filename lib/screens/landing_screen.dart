@@ -6,6 +6,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:marketdo_app_vendor/screens/login_screen.dart';
 import 'package:marketdo_app_vendor/screens/main_screen.dart';
+import 'package:marketdo_app_vendor/screens/registration_screen.dart';
 import 'package:marketdo_app_vendor/widget/api_widgets.dart';
 
 class LandingScreen extends StatefulWidget {
@@ -16,25 +17,26 @@ class LandingScreen extends StatefulWidget {
 }
 
 class _LandingScreenState extends State<LandingScreen> {
-  Widget nextScreen() {
+  nextScreen() {
     final currentUser = FirebaseAuth.instance.currentUser;
     if (currentUser != null) {
-      return FutureBuilder<QuerySnapshot>(
+      return FutureBuilder(
           future: FirebaseFirestore.instance
-              .collection('vendor')
+              .collection('vendors')
               .where('vendorID', isEqualTo: currentUser.uid)
               .get(),
-          builder:
-              (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+          builder: (context, snapshot) {
             if (snapshot.hasError) {
               return errorWidget(snapshot.error.toString());
-            } else if (snapshot.connectionState == ConnectionState.waiting) {
+            }
+            if (snapshot.connectionState == ConnectionState.waiting) {
               return loadingWidget();
-            } else {
-              final vendors = snapshot.data?.docs ?? [];
+            }
+            if (snapshot.hasData) {
+              final vendors = snapshot.data!.docs;
               for (var vendor in vendors) {
-                bool isApproved = vendor.get('isApproved');
-                if (isApproved == true) {
+                var vendorID = vendor.get('vendorID');
+                if (vendorID != null) {
                   Timer(
                       const Duration(seconds: 1),
                       () => Navigator.pushReplacement(
@@ -52,8 +54,8 @@ class _LandingScreenState extends State<LandingScreen> {
                                   const LandingWidget())));
                 }
               }
-              return loadingWidget();
             }
+            return const RegistrationScreen();
           });
     } else {
       Timer(
@@ -62,7 +64,6 @@ class _LandingScreenState extends State<LandingScreen> {
               context,
               MaterialPageRoute(
                   builder: (BuildContext context) => const LoginScreen())));
-      return loadingWidget();
     }
   }
 

@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:marketdo_app_vendor/model/product_model.dart';
+import 'package:marketdo_app_vendor/screens/product_details.dart';
 import 'package:marketdo_app_vendor/widget/api_widgets.dart';
 
 class PublishedProduct extends StatelessWidget {
@@ -36,7 +37,11 @@ class PublishedProduct extends StatelessWidget {
                 return Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: InkWell(
-                        onTap: () {},
+                        onTap: () => Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (_) => ProductDetailScreen(
+                                    productID: product.productID))),
                         child: Container(
                             padding: const EdgeInsets.all(8),
                             height: 80,
@@ -47,11 +52,9 @@ class PublishedProduct extends StatelessWidget {
                                   child: SizedBox(
                                       height: 90,
                                       width: 90,
-                                      child: Hero(
-                                          tag: product.imageURL,
-                                          child: CachedNetworkImage(
-                                              imageUrl: product.imageURL,
-                                              fit: BoxFit.cover)))),
+                                      child: CachedNetworkImage(
+                                          imageUrl: product.imageURL,
+                                          fit: BoxFit.cover))),
                               const SizedBox(height: 10),
                               Text(product.productName,
                                   textAlign: TextAlign.center,
