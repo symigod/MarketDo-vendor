@@ -8,22 +8,16 @@ import 'package:image_picker/image_picker.dart';
 import 'package:marketdo_app_vendor/widget/dialogs.dart';
 
 String? authID = FirebaseAuth.instance.currentUser!.uid;
-CollectionReference cartsCollection =
-    FirebaseFirestore.instance.collection('carts');
-CollectionReference categoriesCollection =
+final cartsCollection = FirebaseFirestore.instance.collection('carts');
+final categoriesCollection =
     FirebaseFirestore.instance.collection('categories');
-CollectionReference customersCollection =
-    FirebaseFirestore.instance.collection('customers');
-CollectionReference favoritesCollection =
-    FirebaseFirestore.instance.collection('favorites');
-CollectionReference homeBannerCollection =
+final customersCollection = FirebaseFirestore.instance.collection('customers');
+final favoritesCollection = FirebaseFirestore.instance.collection('favorites');
+final homeBannerCollection =
     FirebaseFirestore.instance.collection('homeBanner');
-CollectionReference ordersCollection =
-    FirebaseFirestore.instance.collection('orders');
-CollectionReference productsCollection =
-    FirebaseFirestore.instance.collection('products');
-CollectionReference vendorsCollection =
-    FirebaseFirestore.instance.collection('vendors');
+final ordersCollection = FirebaseFirestore.instance.collection('orders');
+final productsCollection = FirebaseFirestore.instance.collection('products');
+final vendorsCollection = FirebaseFirestore.instance.collection('vendors');
 
 class FirebaseServices {
   firebase_storage.FirebaseStorage storage =
@@ -53,13 +47,13 @@ class FirebaseServices {
 
   Future<void> addVendor({Map<String, dynamic>? data}) => vendorsCollection
       .doc(authID)
-      .set(data)
+      .set(data!)
       .then((value) => print("User Added"));
 
   Future<void> saveToDb(
           {Map<String, dynamic>? data, BuildContext? context}) async =>
       productsCollection
-          .add(data)
+          .add(data!)
           .then((value) => scaffold(context, 'Product Saved'));
 
   String formattedDate(date) => DateFormat('dd/MM/yyyy hh:mm aa').format(date);
