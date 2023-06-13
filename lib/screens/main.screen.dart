@@ -1,10 +1,10 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:marketdo_app_vendor/screens/add_product_screen.dart';
-import 'package:marketdo_app_vendor/screens/login_screen.dart';
-import 'package:marketdo_app_vendor/screens/order_screen/order_screen.dart';
-import 'package:marketdo_app_vendor/screens/product_screen.dart';
-import 'package:marketdo_app_vendor/widget/custom_drawer.dart';
+import 'package:marketdo_app_vendor/screens/products/add.product.dart';
+import 'package:marketdo_app_vendor/screens/authentication/login.dart';
+import 'package:marketdo_app_vendor/screens/orders/order_screen.dart';
+import 'package:marketdo_app_vendor/screens/products/main.products.dart';
+import 'package:marketdo_app_vendor/widget/drawer.dart';
 import 'package:marketdo_app_vendor/widget/dialogs.dart';
 
 class MainScreen extends StatefulWidget {
@@ -47,8 +47,10 @@ class _MainScreenState extends State<MainScreen> {
               FloatingActionButtonLocation.miniEndFloat,
           floatingActionButton: FloatingActionButton(
               mini: true,
-              onPressed: () => Navigator.push(context,
-                  MaterialPageRoute(builder: (_) => const AddProductScreen())),
+              onPressed: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => const AddProductScreen())),
               backgroundColor: Colors.green.shade900,
               child: const Icon(Icons.add)),
           bottomNavigationBar: BottomNavigationBar(

@@ -4,10 +4,11 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:marketdo_app_vendor/screens/login_screen.dart';
-import 'package:marketdo_app_vendor/screens/main_screen.dart';
-import 'package:marketdo_app_vendor/screens/registration_screen.dart';
-import 'package:marketdo_app_vendor/widget/api_widgets.dart';
+import 'package:marketdo_app_vendor/firebase.services.dart';
+import 'package:marketdo_app_vendor/screens/authentication/login.dart';
+import 'package:marketdo_app_vendor/screens/main.screen.dart';
+import 'package:marketdo_app_vendor/screens/authentication/registration.dart';
+import 'package:marketdo_app_vendor/widget/snapshots.dart';
 
 class LandingScreen extends StatefulWidget {
   const LandingScreen({Key? key}) : super(key: key);
@@ -21,19 +22,18 @@ class _LandingScreenState extends State<LandingScreen> {
     final currentUser = FirebaseAuth.instance.currentUser;
     if (currentUser != null) {
       return FutureBuilder(
-          future: FirebaseFirestore.instance
-              .collection('vendors')
+          future: vendorsCollection
               .where('vendorID', isEqualTo: currentUser.uid)
               .get(),
-          builder: (context, snapshot) {
-            if (snapshot.hasError) {
-              return errorWidget(snapshot.error.toString());
+          builder: (context, vs) {
+            if (vs.hasError) {
+              return errorWidget(vs.error.toString());
             }
-            if (snapshot.connectionState == ConnectionState.waiting) {
+            if (vs.connectionState == ConnectionState.waiting) {
               return loadingWidget();
             }
-            if (snapshot.hasData) {
-              final vendors = snapshot.data!.docs;
+            if (vs.data!.docs.isNotEmpty) {
+              final vendors = vs.data!.docs;
               for (var vendor in vendors) {
                 var vendorID = vendor.get('vendorID');
                 if (vendorID != null) {
@@ -51,11 +51,13 @@ class _LandingScreenState extends State<LandingScreen> {
                           context,
                           MaterialPageRoute(
                               builder: (BuildContext context) =>
-                                  const LandingWidget())));
+                                  const RegistrationScreen())));
                 }
               }
+            } else {
+              return const RegistrationScreen();
             }
-            return const RegistrationScreen();
+            return loadingWidget();
           });
     } else {
       Timer(
@@ -88,10 +90,8 @@ class _LandingWidgetState extends State<LandingWidget> {
   @override
   Widget build(BuildContext context) => Scaffold(
       body: StreamBuilder(
-          stream: FirebaseFirestore.instance
-              .collection('vendor')
-              .where('vendorID',
-                  isEqualTo: FirebaseAuth.instance.currentUser!.uid)
+          stream: vendorsCollection
+              .where('vendorID', isEqualTo: authID)
               .snapshots(),
           builder: (context, snapshot) {
             if (snapshot.hasError) {

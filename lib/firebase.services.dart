@@ -7,18 +7,25 @@ import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 import 'package:image_picker/image_picker.dart';
 import 'package:marketdo_app_vendor/widget/dialogs.dart';
 
+String? authID = FirebaseAuth.instance.currentUser!.uid;
+CollectionReference cartsCollection =
+    FirebaseFirestore.instance.collection('carts');
+CollectionReference categoriesCollection =
+    FirebaseFirestore.instance.collection('categories');
+CollectionReference customersCollection =
+    FirebaseFirestore.instance.collection('customers');
+CollectionReference favoritesCollection =
+    FirebaseFirestore.instance.collection('favorites');
+CollectionReference homeBannerCollection =
+    FirebaseFirestore.instance.collection('homeBanner');
+CollectionReference ordersCollection =
+    FirebaseFirestore.instance.collection('orders');
+CollectionReference productsCollection =
+    FirebaseFirestore.instance.collection('products');
+CollectionReference vendorsCollection =
+    FirebaseFirestore.instance.collection('vendors');
+
 class FirebaseServices {
-  User? user = FirebaseAuth.instance.currentUser;
-  final CollectionReference vendor =
-      FirebaseFirestore.instance.collection('vendors');
-  final CollectionReference categories =
-      FirebaseFirestore.instance.collection('categories');
-  final CollectionReference mainCategories =
-      FirebaseFirestore.instance.collection('mainCategories');
-  final CollectionReference subCategories =
-      FirebaseFirestore.instance.collection('subCategories');
-  final CollectionReference product =
-      FirebaseFirestore.instance.collection('product');
   firebase_storage.FirebaseStorage storage =
       firebase_storage.FirebaseStorage.instance;
 
@@ -32,14 +39,6 @@ class FirebaseServices {
     return downloadURL;
   }
 
-  // Future<List> uploadFiles(
-  //     {List<XFile>? images, String? ref, ProductProvider? provider}) async {
-  //   var imageUrls = await Future.wait(images!
-  //       .map((image) => uploadFile(image: File(image.path), reference: ref)));
-  //   provider!.getFormData(imageUrls: imageUrls);
-  //   return imageUrls;
-  // }
-
   Future uploadFile({
     File? image,
     String? reference,
@@ -52,12 +51,16 @@ class FirebaseServices {
     return storageReference.getDownloadURL();
   }
 
-  Future<void> addVendor({Map<String, dynamic>? data}) =>
-      vendor.doc(user!.uid).set(data).then((value) => print("User Added"));
+  Future<void> addVendor({Map<String, dynamic>? data}) => vendorsCollection
+      .doc(authID)
+      .set(data)
+      .then((value) => print("User Added"));
 
   Future<void> saveToDb(
           {Map<String, dynamic>? data, BuildContext? context}) async =>
-      product.add(data).then((value) => scaffold(context, 'Product Saved'));
+      productsCollection
+          .add(data)
+          .then((value) => scaffold(context, 'Product Saved'));
 
   String formattedDate(date) => DateFormat('dd/MM/yyyy hh:mm aa').format(date);
 

@@ -3,8 +3,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:marketdo_app_vendor/firebase_services.dart';
-import 'package:marketdo_app_vendor/screens/landing_screen.dart';
+import 'package:marketdo_app_vendor/firebase.services.dart';
+import 'package:marketdo_app_vendor/screens/authentication/landing.dart';
 
 class RegistrationScreen extends StatefulWidget {
   const RegistrationScreen({Key? key}) : super(key: key);
@@ -42,6 +42,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
           child: TextFormField(
               controller: controller,
               keyboardType: type,
+              maxLength: controller == _contactNumber ? 10 : null,
               decoration: InputDecoration(
                   border: const OutlineInputBorder(),
                   labelText: label,
@@ -74,37 +75,34 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
     if (_formKey.currentState!.validate()) {
       {
         EasyLoading.show(status: 'Please wait...');
-        _services
-            .uploadImage(
-                _shopImage, 'vendors/${_services.user!.uid}/shopImage.jpg')
-            .then((String? url) {
+        _services.uploadImage(_shopImage, 'vendors/$authID/shopImage.jpg').then(
+            (String? url) {
           if (url != null) {
             setState(() => _shopImageUrl = url);
           }
         }).then((value) => _services
-                    .uploadImage(
-                        _logo, 'vendors/${_services.user!.uid}/logo.jpg')
-                    .then((url) => setState(() => _logoUrl = url))
-                    .then((value) {
-                  _services.addVendor(data: {
-                    'address': _address.text,
-                    'businessName': _businessName.text,
-                    'email': FirebaseAuth.instance.currentUser!.email,
-                    'isActive': true,
-                    'landMark': _landMark.text,
-                    'logo': _logoUrl,
-                    'mobile': '+63${_contactNumber.text}',
-                    'shopImage': _shopImageUrl,
-                    'registeredOn': DateTime.now(),
-                    'vendorID': _services.user!.uid,
-                  }).then((value) {
-                    EasyLoading.dismiss();
-                    return Navigator.of(context)
-                        .pushReplacement(MaterialPageRoute(
-                      builder: (BuildContext context) => const LandingScreen(),
-                    ));
-                  });
-                }));
+                .uploadImage(_logo, 'vendors/$authID/logo.jpg')
+                .then((url) => setState(() => _logoUrl = url))
+                .then((value) {
+              _services.addVendor(data: {
+                'address': _address.text,
+                'businessName': _businessName.text,
+                'email': FirebaseAuth.instance.currentUser!.email,
+                'isActive': true,
+                'isApproved': false,
+                'landMark': _landMark.text,
+                'logo': _logoUrl,
+                'mobile': '+63${_contactNumber.text}',
+                'shopImage': _shopImageUrl,
+                'registeredOn': DateTime.now(),
+                'vendorID': authID,
+              }).then((value) {
+                EasyLoading.dismiss();
+                return Navigator.of(context).pushReplacement(MaterialPageRoute(
+                  builder: (BuildContext context) => const LandingScreen(),
+                ));
+              });
+            }));
       }
     }
   }

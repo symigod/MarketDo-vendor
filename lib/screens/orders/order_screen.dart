@@ -1,7 +1,7 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:marketdo_app_vendor/screens/order_screen/history.dart';
-import 'package:marketdo_app_vendor/screens/order_screen/pending.dart';
+import 'package:marketdo_app_vendor/firebase.services.dart';
+import 'package:marketdo_app_vendor/screens/orders/history.dart';
+import 'package:marketdo_app_vendor/screens/orders/pending.dart';
 import 'package:tab_indicator_styler/tab_indicator_styler.dart';
 
 class OrderScreen extends StatefulWidget {
@@ -226,16 +226,9 @@ class _OrderCardState extends State<OrderCard> {
   }
 
   void updateStatus(String uid, String updateStatus) =>
-      FirebaseFirestore.instance
-          .collection('orders')
-          .where('uid', isEqualTo: uid)
-          .get()
-          .then((value) {
+      ordersCollection.where('uid', isEqualTo: uid).get().then((value) {
         for (var order in value.docs) {
-          FirebaseFirestore.instance
-              .collection('orders')
-              .doc(order.id)
-              .update({'orderStatus': updateStatus});
+          ordersCollection.doc(order.id).update({'orderStatus': updateStatus});
         }
       });
 

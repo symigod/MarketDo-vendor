@@ -2,9 +2,10 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:marketdo_app_vendor/model/vendor_model.dart';
-import 'package:marketdo_app_vendor/screens/login_screen.dart';
-import 'package:marketdo_app_vendor/widget/api_widgets.dart';
+import 'package:marketdo_app_vendor/firebase.services.dart';
+import 'package:marketdo_app_vendor/models/vendor.model.dart';
+import 'package:marketdo_app_vendor/screens/authentication/login.dart';
+import 'package:marketdo_app_vendor/widget/snapshots.dart';
 import 'package:marketdo_app_vendor/widget/dialogs.dart';
 
 class CustomDrawer extends StatefulWidget {
@@ -15,31 +16,8 @@ class CustomDrawer extends StatefulWidget {
 }
 
 class _CustomDrawerState extends State<CustomDrawer> {
-  bool _isActive = true;
-  final firebaseUser = FirebaseAuth.instance.currentUser;
-
-  _updateStatus(bool value) async {
-    if (firebaseUser != null) {
-      final vendorDoc = FirebaseFirestore.instance
-          .collection('vendors')
-          .doc(firebaseUser!.uid);
-      final docSnapshot = await vendorDoc.get();
-      if (docSnapshot.exists && context.mounted) {
-        setState(() => _isActive = value);
-        await vendorDoc.update({'isActive': value});
-      } else {
-        showDialog(
-            context: context,
-            builder: (_) => errorDialog(context, 'Vendor not found!'));
-      }
-    }
-  }
-
   Future<VendorModel> fetchData() async {
-    DocumentSnapshot snapshot = await FirebaseFirestore.instance
-        .collection('vendors')
-        .doc(firebaseUser!.uid)
-        .get();
+    DocumentSnapshot snapshot = await vendorsCollection.doc(authID).get();
     return VendorModel.fromFirestore(snapshot);
   }
 
@@ -136,35 +114,23 @@ class _CustomDrawerState extends State<CustomDrawer> {
                         title: const Text('REGISTERED ON:'),
                         subtitle: Text(registeredOn))
                   ]))),
-                  // _menu(menuTitle: 'Home', icon: Icons.home_outlined, route: HomeScreen.id),
-                  // ExpansionTile(
-                  //     leading: const Icon(Icons.weekend_outlined),
-                  //     title: const Text('Products'),
-                  //     children: [
-                  //       _menu(menuTitle: 'All products', route: ProductScreen.id),
-                  //       _menu(menuTitle: 'Add products', route: AddProductScreen.id),
-                  //     ]),
-                  // _menu(
-                  //     menuTitle: 'Orders',
-                  //     icon: Icons.shopping_cart_checkout_outlined,
-                  //     route: OrderScreen.id),
                   Column(mainAxisAlignment: MainAxisAlignment.end, children: [
-                    ListTile(
-                        dense: true,
-                        title: Text(
-                            _isActive
-                                ? 'Active Status (ON)'
-                                : 'Active Status (OFF)',
-                            style: TextStyle(
-                                color: _isActive
-                                    ? Colors.green.shade900
-                                    : Colors.red,
-                                fontWeight: FontWeight.bold)),
-                        trailing: Switch(
-                            value: _isActive,
-                            onChanged: (value) => _updateStatus(value),
-                            activeColor: Colors.green.shade900,
-                            inactiveThumbColor: Colors.red)),
+                    // ListTile(
+                    //     dense: true,
+                    //     title: Text(
+                    //         _isActive
+                    //             ? 'Active Status (ON)'
+                    //             : 'Active Status (OFF)',
+                    //         style: TextStyle(
+                    //             color: _isActive
+                    //                 ? Colors.green.shade900
+                    //                 : Colors.red,
+                    //             fontWeight: FontWeight.bold)),
+                    //     trailing: Switch(
+                    //         value: _isActive,
+                    //         onChanged: (value) => _updateStatus(value),
+                    //         activeColor: Colors.green.shade900,
+                    //         inactiveThumbColor: Colors.red)),
                     ListTile(
                         onTap: () => showDialog(
                             context: context,

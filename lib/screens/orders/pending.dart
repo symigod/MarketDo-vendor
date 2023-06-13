@@ -1,7 +1,6 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:marketdo_app_vendor/widget/api_widgets.dart';
+import 'package:marketdo_app_vendor/firebase.services.dart';
+import 'package:marketdo_app_vendor/widget/snapshots.dart';
 
 class PendingOrdersScreen extends StatefulWidget {
   const PendingOrdersScreen({super.key});
@@ -13,10 +12,7 @@ class PendingOrdersScreen extends StatefulWidget {
 class _PendingOrdersScreenState extends State<PendingOrdersScreen> {
   @override
   Widget build(BuildContext context) => StreamBuilder(
-      stream: FirebaseFirestore.instance
-          .collection('orders')
-          .where('vendorID', isEqualTo: FirebaseAuth.instance.currentUser!.uid)
-          .snapshots(),
+      stream: ordersCollection.where('vendorID', isEqualTo: authID).snapshots(),
       builder: (context, snapshot) {
         if (snapshot.hasError) {
           return errorWidget(snapshot.error.toString());
@@ -34,8 +30,7 @@ class _PendingOrdersScreenState extends State<PendingOrdersScreen> {
                 var order = orders[index];
                 int quantity = order['productIDs'].length;
                 return FutureBuilder(
-                    future: FirebaseFirestore.instance
-                        .collection('customers')
+                    future: customersCollection
                         .where('customerID', isEqualTo: order['customerID'])
                         .get(),
                     builder: (context, cSnapshot) {

@@ -1,8 +1,8 @@
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:marketdo_app_vendor/model/product_model.dart';
-import 'package:marketdo_app_vendor/widget/api_widgets.dart';
+import 'package:marketdo_app_vendor/firebase.services.dart';
+import 'package:marketdo_app_vendor/models/product.model.dart';
+import 'package:marketdo_app_vendor/widget/snapshots.dart';
 
 class ProductDetailScreen extends StatefulWidget {
   final String productID;
@@ -18,8 +18,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
       appBar: AppBar(elevation: 0, title: const Text('Product Details')),
       body: SafeArea(
           child: StreamBuilder(
-              stream: FirebaseFirestore.instance
-                  .collection('products')
+              stream: productsCollection
                   .where('productID', isEqualTo: widget.productID)
                   .snapshots(),
               builder: (context, snapshot) {
@@ -52,16 +51,17 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                                             imageUrl: product.imageURL,
                                             fit: BoxFit.cover))))),
                         Column(children: [
-                          Text(product.productName,
-                              style: TextStyle(
-                                  color: Colors.green.shade900,
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.bold)),
                           ListTile(
                               dense: true,
                               leading: const Icon(Icons.info),
+                              title: Text(product.productName),
+                              subtitle: Text(product.description)),
+                          const Divider(height: 0, thickness: 1),
+                          ListTile(
+                              dense: true,
+                              leading: const Icon(Icons.category),
                               title: Text(product.category),
-                              subtitle: Text(product.description),
+                              subtitle: Text(product.subcategory),
                               trailing: Row(
                                   mainAxisSize: MainAxisSize.min,
                                   children: [
@@ -69,8 +69,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                                         color: Colors.red),
                                     const SizedBox(width: 5),
                                     StreamBuilder(
-                                        stream: FirebaseFirestore.instance
-                                            .collection('favorites')
+                                        stream: favoritesCollection
                                             .where('productID',
                                                 isEqualTo: product.productID)
                                             .snapshots(),

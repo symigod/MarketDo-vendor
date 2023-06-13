@@ -1,11 +1,10 @@
 import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:marketdo_app_vendor/firebase_services.dart';
+import 'package:marketdo_app_vendor/firebase.services.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
-import 'package:marketdo_app_vendor/widget/api_widgets.dart';
+import 'package:marketdo_app_vendor/widget/snapshots.dart';
 import 'package:marketdo_app_vendor/widget/dialogs.dart';
 
 class AddProductScreen extends StatefulWidget {
@@ -21,11 +20,6 @@ class _AddProductScreenState extends State<AddProductScreen>
   @override
   bool get wantKeepAlive => true;
   final FirebaseServices _services = FirebaseServices();
-  // final List<String> _sizeList = [];
-  // bool? _saved = false;
-
-  // final _sizeText = TextEditingController();
-  // bool _entered = false;
 
   String? selectedUnit;
   final List<String> _length = [
@@ -113,14 +107,14 @@ class _AddProductScreenState extends State<AddProductScreen>
   }
 
   String? selectedCategory;
+  String? selectedSubcategory;
   List<String> categories = [];
+  List<String> subcategories = [];
 
   Future<void> fetchCategories() async {
     try {
-      QuerySnapshot snapshot = await FirebaseFirestore.instance
-          .collection('categories')
-          .orderBy('category')
-          .get();
+      QuerySnapshot snapshot =
+          await categoriesCollection.orderBy('category').get();
       List<String> fetchedCategories = [];
       for (var doc in snapshot.docs) {
         fetchedCategories.add(doc['category']);
@@ -128,6 +122,25 @@ class _AddProductScreenState extends State<AddProductScreen>
       setState(() => categories.addAll(fetchedCategories));
     } catch (error) {
       print('Error fetching categories: $error');
+    }
+  }
+
+  Future<void> fetchSubcategories(String? category) async {
+    selectedSubcategory = null;
+    subcategories.clear();
+    try {
+      QuerySnapshot snapshot = await categoriesCollection
+          .where('category', isEqualTo: category)
+          .get();
+      List<String> fetchedCategories = [];
+      for (var doc in snapshot.docs) {
+        List<dynamic> subcategories = doc['subcategories'];
+        fetchedCategories
+            .addAll(subcategories.map((subcategory) => subcategory.toString()));
+      }
+      setState(() => subcategories.addAll(fetchedCategories));
+    } catch (error) {
+      print('Error fetching subcategories: $error');
     }
   }
 
@@ -146,29 +159,83 @@ class _AddProductScreenState extends State<AddProductScreen>
 
   @override
   Widget build(BuildContext context) {
-    Widget categoryDropdown(categories) {
+    super.build(context);
+    final formKey = GlobalKey<FormState>();
+    Widget categoryDropdown(List<String> categories) {
       if (categories.isEmpty) {
         return loadingWidget();
       } else {
         return Padding(
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
             child: DropdownButtonFormField<String>(
+                isDense: false,
+                isExpanded: true,
                 dropdownColor: Colors.yellow,
                 decoration: const InputDecoration(border: OutlineInputBorder()),
                 value: selectedCategory,
                 hint: const Text('Select category'),
                 icon: const Icon(Icons.arrow_drop_down),
-                elevation: 16,
-                onChanged: (String? newValue) =>
-                    setState(() => selectedCategory = newValue!),
-                items: categories.map<DropdownMenuItem<String>>((String value) {
-                  return DropdownMenuItem<String>(
-                      value: value, child: Text(value));
-                }).toList(),
+                elevation: 10,
+                onChanged: (String? newValue) async {
+                  await fetchSubcategories(newValue);
+                  selectedCategory = newValue!;
+                  selectedSubcategory = null;
+                },
+                items: categories
+                    .map<DropdownMenuItem<String>>((String value) =>
+                        DropdownMenuItem<String>(
+                            value: value,
+                            child: ListTile(
+                                leading: FutureBuilder(
+                                    future: categoriesCollection
+                                        .where('category', isEqualTo: value)
+                                        .get(),
+                                    builder: (context, snapshot) {
+                                      if (snapshot.hasData) {
+                                        final categoryData =
+                                            snapshot.data!.docs[0];
+                                        final imageURL =
+                                            categoryData['imageURL'];
+                                        return ClipRRect(
+                                            borderRadius:
+                                                BorderRadius.circular(50),
+                                            child: Image.network(imageURL,
+                                                width: 45,
+                                                height: 45,
+                                                fit: BoxFit.cover));
+                                      }
+                                      return const CircularProgressIndicator();
+                                    }),
+                                title: Text(value))))
+                    .toList(),
                 validator: (value) =>
                     value!.isEmpty ? 'Select category' : null));
       }
     }
+
+    Widget subcategoriesDropdown(List<String> subcategories) =>
+        selectedCategory == null
+            ? const SizedBox.shrink()
+            : Padding(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                child: DropdownButtonFormField<String>(
+                    dropdownColor: Colors.yellow,
+                    decoration:
+                        const InputDecoration(border: OutlineInputBorder()),
+                    value: selectedSubcategory,
+                    hint: const Text('Select subcategory'),
+                    icon: const Icon(Icons.arrow_drop_down),
+                    elevation: 10,
+                    onChanged: (String? newValue) =>
+                        selectedSubcategory = newValue!,
+                    items: subcategories
+                        .map<DropdownMenuItem<String>>((String value) =>
+                            DropdownMenuItem<String>(
+                                value: value, child: Text(value)))
+                        .toList(),
+                    validator: (value) =>
+                        value!.isEmpty ? 'Select subcategory' : null));
 
     Widget unitDropDown(units) => Padding(
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
@@ -180,15 +247,14 @@ class _AddProductScreenState extends State<AddProductScreen>
             hint: const Text('Select Unit'),
             icon: const Icon(Icons.arrow_drop_down),
             elevation: 16,
-            onChanged: (String? newValue) => selectedUnit = newValue!,
+            onChanged: (String? newValue) =>
+                setState(() => selectedUnit = newValue),
             items: _units
                 .map<DropdownMenuItem<String>>((String value) =>
                     DropdownMenuItem<String>(value: value, child: Text(value)))
                 .toList(),
             validator: (value) => value!.isEmpty ? 'Select unit' : null));
 
-    super.build(context);
-    final formKey = GlobalKey<FormState>();
     return Form(
         key: formKey,
         child: Scaffold(
@@ -220,6 +286,7 @@ class _AddProductScreenState extends State<AddProductScreen>
                                 child: const Text('CHANGE'),
                                 onPressed: () => _pickAndUploadImage()))
                       ])),
+              const SizedBox(height: 20),
               _services.formField(productName,
                   label: 'Product Name',
                   inputType: TextInputType.name,
@@ -230,6 +297,8 @@ class _AddProductScreenState extends State<AddProductScreen>
                   maxLine: null,
                   onChanged: (value) => value = description.text),
               categoryDropdown(categories),
+              if (selectedCategory != null)
+                subcategoriesDropdown(subcategories),
               unitDropDown(_units),
               _services.formField(regularPrice,
                   label: 'Regular price',
@@ -251,13 +320,11 @@ class _AddProductScreenState extends State<AddProductScreen>
                       style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.green.shade900),
                       onPressed: () {
-                        if (_downloadURL == '') {
+                        if (_downloadURL == null || _pickedImage == null) {
                           _services.scaffold(context, 'Image not selected');
                           return;
                         }
                         if (formKey.currentState!.validate()) {
-                          final productsCollection =
-                              FirebaseFirestore.instance.collection('products');
                           final docID = productsCollection.doc().id;
                           productsCollection.doc(docID).set({
                             'category': selectedCategory,
@@ -268,11 +335,12 @@ class _AddProductScreenState extends State<AddProductScreen>
                             'regularPrice': double.parse(regularPrice.text),
                             'shippingCharge': double.parse(shippingCharge.text),
                             'stockOnHand': int.parse(stockOnHand.text),
+                            'subcategory': selectedSubcategory,
                             'unit': extractUnitText(selectedUnit!),
-                            'vendorID': FirebaseAuth.instance.currentUser!.uid
+                            'vendorID': authID
                           }).then((value) {
-                            Navigator.pop(context);
                             return showDialog(
+                                    barrierDismissible: false,
                                     context: context,
                                     builder: (_) => successDialog(
                                         context, 'Product successfully added!'))
@@ -287,9 +355,9 @@ class _AddProductScreenState extends State<AddProductScreen>
   clearAll() {
     setState(() {
       selectedCategory = '';
+      selectedSubcategory = '';
       description.text = '';
-      _downloadURL = null;
-      _isImageSelected = false;
+      _cancelImageSelection();
       productName.text = '';
       regularPrice.text = '';
       shippingCharge.text = '';
@@ -297,45 +365,4 @@ class _AddProductScreenState extends State<AddProductScreen>
       selectedUnit = '';
     });
   }
-
-  Widget _formField(
-          {String? label,
-          TextInputType? inputType,
-          void Function(String)? onChanged,
-          int? minLine}) =>
-      Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-          child: TextFormField(
-              keyboardType: inputType,
-              decoration: InputDecoration(
-                  border: const OutlineInputBorder(), label: Text(label!)),
-              onChanged: onChanged,
-              minLines: minLine,
-              maxLines: null));
-
-  Widget cardWidget(context, String title, List<Widget> contents) => Card(
-      shape: RoundedRectangleBorder(
-          side: const BorderSide(width: 1, color: Colors.green),
-          borderRadius: BorderRadius.circular(5)),
-      child: Column(children: [
-        Card(
-            color: Colors.green,
-            margin: EdgeInsets.zero,
-            shape: const RoundedRectangleBorder(
-                borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(5), topRight: Radius.circular(5))),
-            child: Center(
-                child: Padding(
-                    padding: const EdgeInsets.all(10),
-                    child: Text(title,
-                        style: const TextStyle(
-                            color: Colors.white, fontWeight: FontWeight.bold),
-                        textAlign: TextAlign.center)))),
-        Padding(
-            padding: const EdgeInsets.all(10),
-            child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: contents))
-      ]));
 }

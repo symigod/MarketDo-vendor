@@ -2,12 +2,13 @@ import 'dart:async';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
-import 'package:marketdo_app_vendor/screens/add_product_screen.dart';
-import 'package:marketdo_app_vendor/screens/home_screen.dart';
-import 'package:marketdo_app_vendor/screens/login_screen.dart';
-import 'package:marketdo_app_vendor/screens/product_Screen.dart';
+import 'package:marketdo_app_vendor/firebase.services.dart';
+import 'package:marketdo_app_vendor/screens/products/add.product.dart';
+import 'package:marketdo_app_vendor/screens/home.dart';
+import 'package:marketdo_app_vendor/screens/authentication/login.dart';
+import 'package:marketdo_app_vendor/screens/products/main.products.dart';
 import 'package:provider/provider.dart';
-import 'screens/order_screen/order_screen.dart';
+import 'screens/orders/order_screen.dart';
 
 int marketDoGreen = 0xFF1B5E20;
 MaterialColor _marketDoGreen = MaterialColor(marketDoGreen, {
@@ -23,19 +24,52 @@ MaterialColor _marketDoGreen = MaterialColor(marketDoGreen, {
   900: const Color(0xFF1B5E20)
 });
 
+void updateVendorOnlineStatus(String? vendorId, bool isOnline) =>
+    vendorsCollection
+        .doc(vendorId)
+        .update({'isOnline': isOnline})
+        .then((value) =>
+            isOnline == true ? print('VENDOR ONLINE') : print('VENDOR OFFLINE'))
+        .catchError(
+            (error) => print('Failed to update vendor online status: $error'));
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
   Provider.debugCheckInvalidValueType = null;
   runApp(const MyApp());
-  //   MultiProvider(providers: const [
-  //   // Provider<VendorProvider>(create: (_) => VendorProvider()),
-  //   // Provider<ProductProvider>(create: (_) => ProductProvider())
-  // ],
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({super.key});
+
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+
+    if (state == AppLifecycleState.resumed) {
+      updateVendorOnlineStatus(authID, true);
+    } else {
+      updateVendorOnlineStatus(authID, false);
+    }
+  }
 
   @override
   Widget build(BuildContext context) => MaterialApp(
