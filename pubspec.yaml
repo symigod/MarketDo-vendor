@@ -14,25 +14,26 @@ dependencies:
 
 
   cupertino_icons: ^1.0.2
-  firebase_core: ^2.9.0
-  firebase_auth: ^4.4.0
-  flutterfire_ui: ^0.4.3+20
-  email_validator: ^2.1.17
-  image_picker: ^0.8.7+2
-  csc_picker: ^0.2.7
+  cached_network_image: ^3.2.3
   cloud_firestore: ^4.5.0
+  connectivity: ^3.0.6
+  csc_picker: ^0.2.7
+  email_validator: ^2.1.17
+  firebase_auth: ^4.4.0
+  firebase_core: ^2.9.0
   firebase_storage: ^11.1.0
   flutter_easyloading: ^3.0.5
-  cached_network_image: ^3.2.3
-  provider: ^6.0.5
-  flutter_slidable: ^3.0.0
-  intl: ^0.18.0
-  get_storage: ^2.1.1
-  font_awesome_flutter: ^10.4.0
-  tab_indicator_styler: ^2.0.0
   flutter_iconly: ^1.0.2
   flutter_launcher_icons: ^0.13.1
-  connectivity: ^3.0.6
+  flutter_slidable: ^3.0.0
+  flutterfire_ui: ^0.4.3+20
+  font_awesome_flutter: ^10.4.0
+  get_storage: ^2.1.1
+  image_picker: ^0.8.7+2
+  intl: ^0.18.0
+  provider: ^6.0.5
+  tab_indicator_styler: ^2.0.0
+  
 
 dev_dependencies:
   flutter_test:
