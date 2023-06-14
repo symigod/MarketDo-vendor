@@ -103,13 +103,6 @@ class _CustomDrawerState extends State<CustomDrawer> {
                         subtitle: Text(vendor.landMark)),
                     ListTile(
                         dense: true,
-                        isThreeLine: true,
-                        leading: const Icon(Icons.numbers),
-                        title: Text('PIN CODE: ${vendor.pinCode}'),
-                        subtitle: Text(
-                            'TIN: ${vendor.tin}\nTAX REGISTERED: ${vendor.isTaxRegistered == true ? 'YES' : 'NO'}')),
-                    ListTile(
-                        dense: true,
                         leading: const Icon(Icons.date_range),
                         title: const Text('REGISTERED ON:'),
                         subtitle: Text(registeredOn))

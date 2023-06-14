@@ -12,10 +12,8 @@ class VendorModel {
   final landMark;
   final logo;
   final mobile;
-  final pinCode;
   final shopImage;
   final registeredOn;
-  final tin;
   final vendorID;
 
   VendorModel({
@@ -28,10 +26,8 @@ class VendorModel {
     required this.landMark,
     required this.logo,
     required this.mobile,
-    required this.pinCode,
     required this.shopImage,
     required this.registeredOn,
-    required this.tin,
     required this.vendorID,
   });
 
@@ -47,10 +43,8 @@ class VendorModel {
       landMark: data['landMark'],
       logo: data['logo'],
       mobile: data['mobile'],
-      pinCode: data['pinCode'],
       shopImage: data['shopImage'],
       registeredOn: data['registeredOn'],
-      tin: data['tin'],
       vendorID: data['vendorID'],
     );
   }
@@ -65,10 +59,8 @@ class VendorModel {
         'landMark': landMark,
         'logo': logo,
         'mobile': mobile,
-        'pinCode': pinCode,
         'shopImage': shopImage,
         'registeredOn': registeredOn,
-        'tin': tin,
         'vendorID': vendorID,
       };
 }

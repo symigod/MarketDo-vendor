@@ -25,9 +25,6 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
   XFile? _shopImage;
   String? _shopImageUrl;
   XFile? _logo;
-  String? countryValue;
-  String? stateValue;
-  String? cityValue;
   String? _logoUrl;
 
   final ImagePicker _picker = ImagePicker();

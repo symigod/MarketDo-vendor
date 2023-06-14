@@ -2,7 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:marketdo_app_vendor/firebase.services.dart';
 import 'package:marketdo_app_vendor/models/product.model.dart';
-import 'package:marketdo_app_vendor/screens/products/details.product.dart';
+import 'package:marketdo_app_vendor/screens/products/details.dart';
 import 'package:marketdo_app_vendor/widget/snapshots.dart';
 
 class ProductScreen extends StatelessWidget {
