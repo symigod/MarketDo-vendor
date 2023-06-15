@@ -1,7 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.marketdo_app_vendor">
    <application
-        android:label="marketdo_app_vendor"
+        android:label="MarketDo Vendor"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity

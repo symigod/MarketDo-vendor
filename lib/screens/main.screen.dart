@@ -1,5 +1,7 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:marketdo_app_vendor/firebase.services.dart';
+import 'package:marketdo_app_vendor/main.dart';
 import 'package:marketdo_app_vendor/screens/products/add.dart';
 import 'package:marketdo_app_vendor/screens/orders/main.orders.dart';
 import 'package:marketdo_app_vendor/screens/products/main.products.dart';
@@ -16,6 +18,14 @@ class MainScreen extends StatefulWidget {
 }
 
 class _MainScreenState extends State<MainScreen> {
+  @override
+  void initState() {
+    super.initState();
+    if (FirebaseAuth.instance.currentUser != null) {
+      updateVendorOnlineStatus(authID, true);
+    }
+  }
+
   List<Widget> screens = [
     const ProductScreen(),
     const OrderScreen(),
