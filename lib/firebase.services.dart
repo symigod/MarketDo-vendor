@@ -8,6 +8,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:marketdo_app_vendor/widget/dialogs.dart';
 
 String? authID = FirebaseAuth.instance.currentUser!.uid;
+final blocksCollection = FirebaseFirestore.instance.collection('blocks');
 final cartsCollection = FirebaseFirestore.instance.collection('carts');
 final categoriesCollection =
     FirebaseFirestore.instance.collection('categories');
