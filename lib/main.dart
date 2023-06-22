@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
@@ -8,7 +9,10 @@ import 'package:marketdo_app_vendor/screens/products/add.dart';
 import 'package:marketdo_app_vendor/screens/home.dart';
 import 'package:marketdo_app_vendor/screens/authentication/login.dart';
 import 'package:marketdo_app_vendor/screens/products/main.products.dart';
+import 'package:marketdo_app_vendor/widget/dialogs.dart';
 import 'screens/orders/main.orders.dart';
+
+String appVersion = dateTimeToString(Timestamp.now());
 
 int marketDoGreen = 0xFF1B5E20;
 MaterialColor _marketDoGreen = MaterialColor(marketDoGreen, {

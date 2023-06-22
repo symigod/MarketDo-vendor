@@ -1,8 +1,8 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:marketdo_app_vendor/firebase.services.dart';
 import 'package:marketdo_app_vendor/main.dart';
+import 'package:marketdo_app_vendor/screens/blocked.dart';
 import 'package:marketdo_app_vendor/screens/products/add.dart';
 import 'package:marketdo_app_vendor/screens/orders/main.orders.dart';
 import 'package:marketdo_app_vendor/screens/products/main.products.dart';
@@ -32,7 +32,7 @@ class _MainScreenState extends State<MainScreen> {
   List<Widget> screens = [
     const ProductScreen(),
     const OrderScreen(),
-    const ProductScreen()
+    const BlockedScreen()
   ];
 
   @override
@@ -60,15 +60,21 @@ class _MainScreenState extends State<MainScreen> {
                                   '${snapshot.data!.docs[0]['businessName']}!',
                                   style: const TextStyle(color: Colors.white))),
                           actions: [
-                            IconButton(
-                                onPressed: () =>
+                            GestureDetector(
+                                onTap: () =>
                                     _scaffoldKey.currentState?.openEndDrawer(),
-                                icon: ClipRRect(
-                                    borderRadius: BorderRadius.circular(50),
-                                    child: CachedNetworkImage(
-                                        imageUrl: snapshot.data!.docs[0]
-                                            ['logo'],
-                                        fit: BoxFit.cover)))
+                                child: Container(
+                                    height: 50,
+                                    width: 50,
+                                    margin: const EdgeInsets.all(5),
+                                    decoration: BoxDecoration(
+                                        shape: BoxShape.circle,
+                                        border: Border.all(
+                                            color: Colors.white, width: 1),
+                                        image: DecorationImage(
+                                            image: NetworkImage(
+                                                snapshot.data!.docs[0]['logo']),
+                                            fit: BoxFit.cover))))
                           ]),
                       endDrawer: const CustomDrawer(),
                       body: screens[currentScreen],
@@ -82,7 +88,7 @@ class _MainScreenState extends State<MainScreen> {
                                   builder: (context) =>
                                       const AddProductScreen())),
                           backgroundColor: Colors.green.shade900,
-                          child: const Icon(Icons.add)),
+                          child: const Icon(Icons.add_business)),
                       bottomNavigationBar: BottomNavigationBar(
                           elevation: 0,
                           backgroundColor: Colors.green.shade900,

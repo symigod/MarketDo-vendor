@@ -225,7 +225,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                       style: TextButton.styleFrom(
                           backgroundColor: Colors.red.shade900),
                       onPressed: () => FirebaseAuth.instance.signOut(),
-                      child: const Text('Cancel'))),
+                      child: const Text('Logout'))),
               Container(
                   width: 120,
                   padding: const EdgeInsets.all(10),

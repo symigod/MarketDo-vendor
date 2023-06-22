@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:marketdo_app_vendor/firebase.services.dart';
+import 'package:marketdo_app_vendor/main.dart';
 import 'package:marketdo_app_vendor/models/vendor.model.dart';
 import 'package:marketdo_app_vendor/screens/authentication/login.dart';
 import 'package:marketdo_app_vendor/widget/snapshots.dart';
@@ -108,22 +109,12 @@ class _CustomDrawerState extends State<CustomDrawer> {
                         subtitle: Text(registeredOn))
                   ]))),
                   Column(mainAxisAlignment: MainAxisAlignment.end, children: [
-                    // ListTile(
-                    //     dense: true,
-                    //     title: Text(
-                    //         _isActive
-                    //             ? 'Active Status (ON)'
-                    //             : 'Active Status (OFF)',
-                    //         style: TextStyle(
-                    //             color: _isActive
-                    //                 ? Colors.green.shade900
-                    //                 : Colors.red,
-                    //             fontWeight: FontWeight.bold)),
-                    //     trailing: Switch(
-                    //         value: _isActive,
-                    //         onChanged: (value) => _updateStatus(value),
-                    //         activeColor: Colors.green.shade900,
-                    //         inactiveThumbColor: Colors.red)),
+                    ListTile(
+                      dense: true,
+                      // onTap: () {},
+                      title: const Text('UPDATED ON:'),
+                      subtitle: Text(appVersion),
+                      trailing: const Icon(Icons.update)),
                     ListTile(
                         onTap: () => showDialog(
                             context: context,
