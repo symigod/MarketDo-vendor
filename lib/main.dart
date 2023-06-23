@@ -70,11 +70,15 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
   void didChangeAppLifecycleState(AppLifecycleState state) {
     super.didChangeAppLifecycleState(state);
     if (state == AppLifecycleState.resumed) {
-      isResumed = true;
-      updateVendorOnlineStatus(authID, true);
+      if (FirebaseAuth.instance.currentUser != null) {
+        isResumed = true;
+        updateVendorOnlineStatus(authID, true);
+      }
     } else {
-      isResumed = false;
-      updateVendorOnlineStatus(authID, false);
+      if (FirebaseAuth.instance.currentUser != null) {
+        isResumed = false;
+        updateVendorOnlineStatus(authID, false);
+      }
     }
   }
 

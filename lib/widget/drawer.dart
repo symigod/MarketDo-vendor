@@ -5,7 +5,6 @@ import 'package:intl/intl.dart';
 import 'package:marketdo_app_vendor/firebase.services.dart';
 import 'package:marketdo_app_vendor/main.dart';
 import 'package:marketdo_app_vendor/models/vendor.model.dart';
-import 'package:marketdo_app_vendor/screens/authentication/login.dart';
 import 'package:marketdo_app_vendor/widget/snapshots.dart';
 import 'package:marketdo_app_vendor/widget/dialogs.dart';
 
@@ -110,20 +109,21 @@ class _CustomDrawerState extends State<CustomDrawer> {
                   ]))),
                   Column(mainAxisAlignment: MainAxisAlignment.end, children: [
                     ListTile(
-                      dense: true,
-                      // onTap: () {},
-                      title: const Text('UPDATED ON:'),
-                      subtitle: Text(appVersion),
-                      trailing: const Icon(Icons.update)),
+                        dense: true,
+                        // onTap: () {},
+                        title: const Text('UPDATED ON:'),
+                        subtitle: Text(appVersion),
+                        trailing: const Icon(Icons.update)),
                     ListTile(
                         onTap: () => showDialog(
                             context: context,
-                            builder: (_) => confirmDialog(context, 'LOGOUT',
-                                    'Do you want to continue?', () {
-                                  FirebaseAuth.instance.signOut();
-                                  Navigator.pushReplacementNamed(
-                                      context, LoginScreen.id);
-                                })),
+                            builder: (_) => confirmDialog(
+                                context,
+                                'LOGOUT',
+                                'Do you want to continue?',
+                                () => FirebaseAuth.instance.signOut().then(
+                                    (value) => updateVendorOnlineStatus(
+                                        authID, true)))),
                         dense: true,
                         tileColor: Colors.red,
                         title: const Text('Logout MarketDo App',

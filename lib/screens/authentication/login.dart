@@ -38,19 +38,28 @@ class _LoginScreenState extends State<LoginScreen> {
                         ? 'Welcome to Marketdo App - Vendor! Please sign in to continue.'
                         : 'Welcome to App-Vendor! Please create an account to continue'));
               },
-              footerBuilder: (context, _) {
-                return const Padding(
-                    padding: EdgeInsets.only(top: 16),
-                    child: Text(
+              footerBuilder: (context, _) => const Padding(
+                  padding: EdgeInsets.only(top: 16),
+                  child: Column(children: [
+                    Text(
                         'By signing in, you agree to our terms and conditions.',
                         style: TextStyle(color: Colors.grey),
-                        textAlign: TextAlign.center));
-              },
+                        textAlign: TextAlign.center),
+                    SizedBox(height: 10),
+                    Text(
+                        'If you have any problems signing in, reset the app in your settings (eg. Clear data, Clear cache).',
+                        style: TextStyle(
+                            color: Colors.red,
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold),
+                        textAlign: TextAlign.center)
+                  ])),
               providerConfigs: const [
                 EmailProviderConfiguration(),
-                GoogleProviderConfiguration(
-                    clientId: '1:780102967000:android:66214768ee06f6a5e901ad'),
-                PhoneProviderConfiguration()
+                // GoogleProviderConfiguration(
+                //     clientId:
+                //         '1:780102967000:android:af3d1b7fd390ef64e901ad'),
+                // PhoneProviderConfiguration()
               ]);
         }
         return const LandingScreen();

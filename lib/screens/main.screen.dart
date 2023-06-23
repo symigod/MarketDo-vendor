@@ -44,8 +44,8 @@ class _MainScreenState extends State<MainScreen> {
               stream: vendorsCollection
                   .where('vendorID', isEqualTo: authID)
                   .snapshots(),
-              builder: (context, snapshot) {
-                if (snapshot.hasData) {
+              builder: (context, vs) {
+                if (vs.hasData) {
                   return Scaffold(
                       key: _scaffoldKey,
                       appBar: AppBar(
@@ -57,7 +57,7 @@ class _MainScreenState extends State<MainScreen> {
                                       color: Colors.white,
                                       fontWeight: FontWeight.bold)),
                               subtitle: Text(
-                                  '${snapshot.data!.docs[0]['businessName']}!',
+                                  '${vs.data!.docs[0]['businessName']}!',
                                   style: const TextStyle(color: Colors.white))),
                           actions: [
                             GestureDetector(
@@ -73,7 +73,7 @@ class _MainScreenState extends State<MainScreen> {
                                             color: Colors.white, width: 1),
                                         image: DecorationImage(
                                             image: NetworkImage(
-                                                snapshot.data!.docs[0]['logo']),
+                                                vs.data!.docs[0]['logo']),
                                             fit: BoxFit.cover))))
                           ]),
                       endDrawer: const CustomDrawer(),
@@ -109,47 +109,68 @@ class _MainScreenState extends State<MainScreen> {
                                           .where('vendorID', isEqualTo: authID)
                                           .where('isPending', isEqualTo: true)
                                           .snapshots(),
-                                      builder: (context, snapshot) {
-                                        if (snapshot.hasError) {
+                                      builder: (context, os) {
+                                        if (os.hasError) {
                                           return errorWidget(
-                                              snapshot.error.toString());
+                                              os.error.toString());
                                         }
-                                        if (snapshot.connectionState ==
+                                        if (os.connectionState ==
                                             ConnectionState.waiting) {
-                                          return Positioned(
-                                              right: 0,
-                                              top: 0,
-                                              child: Container());
+                                          return const SizedBox.shrink();
                                         }
-                                        return Positioned(
-                                            right: 0,
-                                            top: 0,
-                                            child: snapshot.data!.docs.isEmpty
-                                                ? Container()
-                                                : Container(
-                                                    padding:
-                                                        const EdgeInsets.all(2),
-                                                    decoration:
-                                                        const BoxDecoration(
-                                                            color: Colors.red,
-                                                            shape: BoxShape
-                                                                .circle),
-                                                    constraints:
-                                                        const BoxConstraints(
-                                                            minWidth: 12,
-                                                            minHeight: 12),
-                                                    child: Text(
-                                                        snapshot
-                                                            .data!.docs.length
-                                                            .toString(),
-                                                        style: const TextStyle(
-                                                            color: Colors.white,
-                                                            fontSize: 10,
-                                                            fontWeight:
-                                                                FontWeight
-                                                                    .bold),
-                                                        textAlign:
-                                                            TextAlign.center)));
+                                        if (os.hasData) {
+                                          return const SizedBox.shrink();
+                                        }
+                                        return StreamBuilder(
+                                            stream: blocksCollection
+                                                .where('blocker',
+                                                    isEqualTo: authID)
+                                                .where('blocked',
+                                                    arrayContains: os.data!
+                                                        .docs[0]['customerID'])
+                                                .snapshots(),
+                                            builder: (context, bs) {
+                                              if (bs.hasError) {
+                                                return errorWidget(
+                                                    bs.error.toString());
+                                              }
+                                              if (bs.connectionState ==
+                                                  ConnectionState.waiting) {
+                                                return const SizedBox.shrink();
+                                              }
+                                              if (bs.hasData) {
+                                                return Positioned(
+                                                    right: 0,
+                                                    top: 0,
+                                                    child: os.data!.docs.isEmpty
+                                                        ? Container()
+                                                        : Container(
+                                                            padding: const EdgeInsets.all(
+                                                                2),
+                                                            decoration: const BoxDecoration(
+                                                                color:
+                                                                    Colors.red,
+                                                                shape: BoxShape
+                                                                    .circle),
+                                                            constraints: const BoxConstraints(
+                                                                minWidth: 12,
+                                                                minHeight: 12),
+                                                            child: Text(
+                                                                os.data!.docs.length
+                                                                    .toString(),
+                                                                style: const TextStyle(
+                                                                    color: Colors
+                                                                        .white,
+                                                                    fontSize:
+                                                                        10,
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .bold),
+                                                                textAlign: TextAlign
+                                                                    .center)));
+                                              }
+                                              return const SizedBox.shrink();
+                                            });
                                       })
                                 ]),
                                 label: 'Orders'),

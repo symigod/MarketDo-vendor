@@ -15,6 +15,7 @@ class BlockedScreen extends StatefulWidget {
 }
 
 class _BlockedScreenState extends State<BlockedScreen> {
+  bool blocksEmpty = true;
   @override
   Widget build(BuildContext context) => StreamBuilder(
       stream: blocksCollection.where('blocker', isEqualTo: authID).snapshots(),
@@ -28,13 +29,20 @@ class _BlockedScreenState extends State<BlockedScreen> {
         if (bs.hasData) {
           final blocks = bs.data!.docs;
           return ListView.builder(
+              shrinkWrap: blocksEmpty,
               itemCount: blocks.length,
               itemBuilder: (context, index) {
                 final block = blocks[index];
-                return FutureBuilder(
-                    future: customersCollection
-                        .where('customerID', whereIn: block['blocked'])
-                        .get(),
+                final blockedCustomers = block['blocked'] as List<dynamic>;
+                if (blockedCustomers.isEmpty) {
+                  blocksEmpty = true;
+                  return emptyWidget('NO BLOCKED CUSTOMERS');
+                }
+                blocksEmpty = false;
+                return StreamBuilder(
+                    stream: customersCollection
+                        .where('customerID', whereIn: blockedCustomers)
+                        .snapshots(),
                     builder: (context, cs) {
                       if (cs.hasError) {
                         return errorWidget(cs.error.toString());
@@ -48,38 +56,55 @@ class _BlockedScreenState extends State<BlockedScreen> {
                             ? Colors.grey.shade100
                             : Colors.white;
                         return ListTile(
-                          tileColor: tileColor,
-                          onTap: () => viewCustomerDetails(
-                              context, customer['customerID']),
-                          leading: SizedBox(
-                              height: 45,
-                              width: 45,
-                              child: ClipRRect(
-                                  borderRadius: BorderRadius.circular(50),
-                                  child: CachedNetworkImage(
-                                      imageUrl: customer['logo'],
-                                      fit: BoxFit.cover))),
-                          title: Text(customer['name']),
-                          subtitle: FutureBuilder(
-                              future: ordersCollection
-                                  .where('customerID',
-                                      isEqualTo: customer['customerID'])
-                                  .get(),
-                              builder: (context, os) {
-                                if (os.hasError) {
-                                  return errorWidget(os.error.toString());
-                                }
-                                if (os.connectionState ==
-                                    ConnectionState.waiting) {
-                                  return loadingWidget();
-                                }
-                                if (cs.hasData) {
-                                  return Text(
-                                      '${cs.data!.docs.length} ${cs.data!.docs.length > 1 ? ' orders' : 'order'}');
-                                }
-                                return Text('${cs.data!.docs.length} none');
-                              })
-                        );
+                            tileColor: tileColor,
+                            onTap: () => viewCustomerDetails(
+                                context, customer['customerID']),
+                            leading: Container(
+                                height: 40,
+                                width: 40,
+                                decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    border: Border.all(
+                                        color: customer['isOnline']
+                                            ? Colors.green
+                                            : Colors.grey,
+                                        width: 2)),
+                                child: Container(
+                                    decoration: BoxDecoration(
+                                        shape: BoxShape.circle,
+                                        border: Border.all(
+                                            color: Colors.white, width: 2)),
+                                    child: ClipRRect(
+                                      borderRadius: BorderRadius.circular(50),
+                                      child: CachedNetworkImage(
+                                          imageUrl: customer['logo'],
+                                          fit: BoxFit.cover),
+                                    ))),
+                            title: Text(customer['name']),
+                            trailing: FittedBox(
+                                child: FutureBuilder(
+                                    future: ordersCollection
+                                        .where('customerID',
+                                            isEqualTo: customer['customerID'])
+                                        .get(),
+                                    builder: (context, os) {
+                                      if (os.hasError) {
+                                        return errorWidget(os.error.toString());
+                                      }
+                                      if (os.connectionState ==
+                                          ConnectionState.waiting) {
+                                        return loadingWidget();
+                                      }
+                                      if (os.hasData) {
+                                        return Text(
+                                            '${os.data!.docs.length} ${os.data!.docs.length > 1 ? ' orders' : 'order'}',
+                                            style: const TextStyle(
+                                                color: Colors.red,
+                                                fontWeight: FontWeight.bold));
+                                      }
+                                      return Text(
+                                          '${os.data!.docs.length} none');
+                                    })));
                       }
                       return emptyWidget('CUSTOMER NOT FOUND');
                     });
