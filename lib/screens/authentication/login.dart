@@ -35,8 +35,8 @@ class _LoginScreenState extends State<LoginScreen> {
                 return Padding(
                     padding: const EdgeInsets.only(bottom: 8),
                     child: Text(action == AuthAction.signIn
-                        ? 'Welcome to Marketdo App - Vendor! Please sign in to continue.'
-                        : 'Welcome to App-Vendor! Please create an account to continue'));
+                        ? 'Welcome to MarketDo App - Vendor!\nPlease sign in to continue.'
+                        : 'Welcome to MarketDo App - Vendor!\nPlease create an account to continue'));
               },
               footerBuilder: (context, _) => const Padding(
                   padding: EdgeInsets.only(top: 16),
