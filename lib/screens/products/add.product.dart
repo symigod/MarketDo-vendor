@@ -50,7 +50,8 @@ class _AddProductScreenState extends State<AddProductScreen>
     'Unit (u)',
     'Piece (pc)',
     'Box (box)',
-    'Carton (ctn)'
+    'Carton (ctn)',
+    'Pair (pr)'
   ];
   final List<String> _bundles = ['Bundle (bdl)', 'Pack (pk)', 'Batch (bch)'];
   final List<String> _container = [
@@ -134,7 +135,9 @@ class _AddProductScreenState extends State<AddProductScreen>
           .get();
       List<String> fetchedCategories = [];
       for (var doc in snapshot.docs) {
-        List<dynamic> subcategories = doc['subcategories'];
+        List<String> subcategories = List<String>.from(doc['subcategories']);
+        subcategories
+            .sort((a, b) => a.toLowerCase().compareTo(b.toLowerCase()));
         fetchedCategories
             .addAll(subcategories.map((subcategory) => subcategory.toString()));
       }

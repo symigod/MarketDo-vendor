@@ -26,7 +26,7 @@ class _BlockedScreenState extends State<BlockedScreen> {
         if (bs.connectionState == ConnectionState.waiting) {
           return loadingWidget();
         }
-        if (bs.hasData) {
+        if (bs.data!.docs.isNotEmpty) {
           final blocks = bs.data!.docs;
           return ListView.builder(
               shrinkWrap: blocksEmpty,
@@ -50,7 +50,7 @@ class _BlockedScreenState extends State<BlockedScreen> {
                       if (cs.connectionState == ConnectionState.waiting) {
                         return loadingWidget();
                       }
-                      if (cs.hasData) {
+                      if (cs.data!.docs.isNotEmpty) {
                         final customer = cs.data!.docs[0];
                         var tileColor = index % 2 == 0
                             ? Colors.grey.shade100

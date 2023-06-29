@@ -2,7 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:marketdo_app_vendor/firebase.services.dart';
 import 'package:marketdo_app_vendor/models/product.model.dart';
-import 'package:marketdo_app_vendor/screens/products/details.dart';
+import 'package:marketdo_app_vendor/screens/products/details.product.dart';
 import 'package:marketdo_app_vendor/widget/snapshots.dart';
 
 class ProductScreen extends StatelessWidget {
@@ -16,6 +16,7 @@ class ProductScreen extends StatelessWidget {
       body: StreamBuilder(
           stream: productsCollection
               .where('vendorID', isEqualTo: authID)
+              .orderBy('productName')
               .snapshots(),
           builder: ((context, snapshot) {
             if (snapshot.hasError) {
@@ -57,7 +58,7 @@ class ProductScreen extends StatelessWidget {
                                           child: CachedNetworkImage(
                                               imageUrl: product.imageURL,
                                               fit: BoxFit.cover))),
-                                  const SizedBox(height: 10),
+                                  const SizedBox(height: 5),
                                   Text(product.productName,
                                       textAlign: TextAlign.center,
                                       style: const TextStyle(fontSize: 10),

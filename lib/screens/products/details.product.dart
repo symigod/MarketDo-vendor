@@ -2,6 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:marketdo_app_vendor/firebase.services.dart';
 import 'package:marketdo_app_vendor/models/product.model.dart';
+import 'package:marketdo_app_vendor/widget/dialogs.dart';
 import 'package:marketdo_app_vendor/widget/snapshots.dart';
 
 class ProductDetailScreen extends StatefulWidget {
@@ -101,7 +102,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                               title:
                                   Text('Regular Price (per ${product.unit})'),
                               trailing: Text(
-                                  'P ${product.regularPrice.toStringAsFixed(2)}',
+                                       'P ${numberToString(product.regularPrice.toDouble())}',
                                   style: const TextStyle(
                                       color: Colors.red,
                                       fontWeight: FontWeight.bold))),
@@ -111,7 +112,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                               leading: const Icon(Icons.delivery_dining),
                               title: const Text('Delivery Fee'),
                               trailing: Text(
-                                  'P ${product.shippingCharge.toStringAsFixed(2)}',
+                                'P ${numberToString(product.shippingCharge.toDouble())}',
                                   style: const TextStyle(
                                       color: Colors.red,
                                       fontWeight: FontWeight.bold))),

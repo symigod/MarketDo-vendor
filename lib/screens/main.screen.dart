@@ -3,7 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:marketdo_app_vendor/firebase.services.dart';
 import 'package:marketdo_app_vendor/main.dart';
 import 'package:marketdo_app_vendor/screens/blocked.dart';
-import 'package:marketdo_app_vendor/screens/products/add.dart';
+import 'package:marketdo_app_vendor/screens/categories.dart';
+import 'package:marketdo_app_vendor/screens/products/add.product.dart';
 import 'package:marketdo_app_vendor/screens/orders/main.orders.dart';
 import 'package:marketdo_app_vendor/screens/products/main.products.dart';
 import 'package:marketdo_app_vendor/widget/drawer.dart';
@@ -29,10 +30,11 @@ class _MainScreenState extends State<MainScreen> {
     }
   }
 
-  List<Widget> screens = [
-    const ProductScreen(),
-    const OrderScreen(),
-    const BlockedScreen()
+  List<Widget> screens = const [
+    ProductScreen(),
+    CategoryScreen(),
+    OrderScreen(),
+    BlockedScreen()
   ];
 
   @override
@@ -77,7 +79,7 @@ class _MainScreenState extends State<MainScreen> {
                                             fit: BoxFit.cover))))
                           ]),
                       endDrawer: const CustomDrawer(),
-                      body: screens[currentScreen],
+                      body: Center(child: screens.elementAt(currentScreen)),
                       floatingActionButtonLocation:
                           FloatingActionButtonLocation.miniEndFloat,
                       floatingActionButton: FloatingActionButton(
@@ -95,12 +97,16 @@ class _MainScreenState extends State<MainScreen> {
                           currentIndex: currentScreen,
                           onTap: (int index) =>
                               setState(() => currentScreen = index),
-                          selectedItemColor: Colors.yellow,
+                          type: BottomNavigationBarType.fixed,
                           showUnselectedLabels: true,
+                          selectedItemColor: Colors.yellow,
                           unselectedItemColor: Colors.white,
                           items: [
                             const BottomNavigationBarItem(
                                 icon: Icon(Icons.store), label: 'My Products'),
+                            const BottomNavigationBarItem(
+                                icon: Icon(Icons.category),
+                                label: 'Categories'),
                             BottomNavigationBarItem(
                                 icon: Stack(children: [
                                   const Icon(Icons.shopping_bag),
