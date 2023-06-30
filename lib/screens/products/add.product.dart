@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:marketdo_app_vendor/firebase.services.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
+import 'package:marketdo_app_vendor/screens/main.screen.dart';
 import 'package:marketdo_app_vendor/widget/snapshots.dart';
 import 'package:marketdo_app_vendor/widget/dialogs.dart';
 
@@ -40,7 +41,8 @@ class _AddProductScreenState extends State<AddProductScreen>
   ];
   final List<String> _volume = [
     'Fluid Ounce(fl oz)',
-    'Cup (c)' 'Pint (pt)',
+    'Cup (c)',
+    'Pint (pt)',
     'Quart (qt)',
     'Gallon (gal)',
     'Milliliter (ml)',
@@ -86,8 +88,8 @@ class _AddProductScreenState extends State<AddProductScreen>
 
       firebase_storage.Reference ref = firebase_storage.FirebaseStorage.instance
           .ref()
-          .child('category_images')
-          .child(DateTime.now().millisecondsSinceEpoch.toString());
+          .child('products')
+          .child(_pickedImage!.name);
 
       firebase_storage.UploadTask uploadTask =
           ref.putFile(File(_pickedImage!.path));
@@ -312,10 +314,11 @@ class _AddProductScreenState extends State<AddProductScreen>
                   label: 'Delivery Fee',
                   inputType: TextInputType.number,
                   onChanged: (value) => value = shippingCharge.text),
-              _services.formField(stockOnHand,
-                  label: 'Stock on hand',
-                  inputType: TextInputType.number,
-                  onChanged: (value) => value = stockOnHand.text)
+              // _services.formField(stockOnHand,
+              //     label: 'Stock on hand',
+              //     unit: selectedUnit,
+              //     inputType: TextInputType.number,
+              //     onChanged: (value) => value = stockOnHand.text)
             ]),
             persistentFooterButtons: [
               Center(
@@ -328,27 +331,38 @@ class _AddProductScreenState extends State<AddProductScreen>
                           return;
                         }
                         if (formKey.currentState!.validate()) {
+                          List<String> keywords = productName.text
+                              .toUpperCase()
+                              .split(RegExp(r'\W+'))
+                              .toList();
                           final docID = productsCollection.doc().id;
-                          productsCollection.doc(docID).set({
-                            'category': selectedCategory,
-                            'description': description.text,
-                            'imageURL': _downloadURL,
-                            'productID': docID,
-                            'productName': productName.text.toUpperCase(),
-                            'regularPrice': double.parse(regularPrice.text),
-                            'shippingCharge': double.parse(shippingCharge.text),
-                            'stockOnHand': int.parse(stockOnHand.text),
-                            'subcategory': selectedSubcategory,
-                            'unit': extractUnitText(selectedUnit!),
-                            'vendorID': authID
-                          }).then((value) {
-                            return showDialog(
-                                    barrierDismissible: false,
-                                    context: context,
-                                    builder: (_) => successDialog(
-                                        context, 'Product successfully added!'))
-                                .then((value) => Navigator.pop(context));
-                          }).then((value) => clearAll());
+                          productsCollection
+                              .doc(docID)
+                              .set({
+                                'category': selectedCategory,
+                                'description': description.text,
+                                'imageURL': _downloadURL,
+                                'productID': docID,
+                                'productName': productName.text.toUpperCase(),
+                                'regularPrice': double.parse(regularPrice.text),
+                                'searchKeywords': keywords,
+                                'shippingCharge':
+                                    double.parse(shippingCharge.text),
+                                // 'stockOnHand': int.parse(stockOnHand.text),
+                                'subcategory': selectedSubcategory,
+                                'unit': extractUnitText(selectedUnit!),
+                                'vendorID': authID
+                              })
+                              .then((value) => showDialog(
+                                  barrierDismissible: false,
+                                  context: context,
+                                  builder: (_) => successDialog(context,
+                                      'Product successfully added!')).then(
+                                  (value) => Navigator.pushReplacement(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (_) => const MainScreen()))))
+                              .then((value) => clearAll());
                         }
                       },
                       child: const Text('Save Product')))

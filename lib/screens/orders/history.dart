@@ -119,7 +119,7 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
                                           )
                                         ])),
                                     trailing: Text(
-                                        'P ${order['totalPayment'].toStringAsFixed(2)}',
+                                        'P ${numberToString(order['totalPayment'].toDouble())}',
                                         style: const TextStyle(
                                             color: Colors.red,
                                             fontWeight: FontWeight.bold)));
@@ -274,7 +274,8 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
                                                               FontWeight.bold))
                                                 ])),
                                             subtitle: Text(product.description),
-                                            trailing: Text('$payments',
+                                            trailing: Text(
+                                                'P ${numberToString(payments)}',
                                                 style: const TextStyle(
                                                     color: Colors.red,
                                                     fontWeight:
@@ -403,6 +404,9 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
                   ]),
                   actionsAlignment: MainAxisAlignment.spaceBetween,
                   actions: [
+                    IconButton(
+                        onPressed: () => Navigator.pop(context),
+                        icon: const Icon(Icons.close, color: Colors.red)),
                     StreamBuilder(
                         stream: blocksCollection
                             .where('blocked', arrayContains: customerID)
@@ -418,16 +422,15 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
                                     unblockCustomer(context, customerID),
                                 child: const Text('Unblock'));
                           }
-                          return ElevatedButton(
-                              style: ElevatedButton.styleFrom(
-                                  backgroundColor: Colors.red),
+                          return IconButton(
                               onPressed: () =>
                                   blockCustomer(context, customerID),
-                              child: const Text('Block'));
+                              icon: Icon(Icons.block,
+                                  color: Colors.red.shade900));
                         }),
-                    ElevatedButton(
+                    IconButton(
                         onPressed: () => Navigator.pop(context),
-                        child: const Text('Close'))
+                        icon: const Icon(Icons.call, color: Colors.green)),
                   ]);
             }
             return emptyWidget('VENDOR NOT FOUND');

@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 Widget confirmDialog(
         context, String title, String message, void Function() onPressed) =>
@@ -46,4 +47,12 @@ String extractUnitText(String? selectedUnit) {
     }
   }
   return '';
+}
+
+Future<void> openURL(context, String url) async {
+  if (!await launchUrl(Uri.parse(url))) {
+    showDialog(
+        context: context,
+        builder: (_) => errorDialog(context, 'Cannot open "$url"'));
+  }
 }

@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -73,6 +74,8 @@ class FirebaseServices {
           child: TextFormField(
               controller: controller,
               keyboardType: inputType,
+              inputFormatters:
+                  label == 'Product Name' ? [UpperCaseTextFormatter()] : null,
               decoration: InputDecoration(
                   border: const OutlineInputBorder(),
                   label: Text(label!),
@@ -82,7 +85,9 @@ class FirebaseServices {
                           : null,
                   suffixText: label == 'Regular price' && unit != null
                       ? ' per ${unitAbbreviation(unit)}'
-                      : null),
+                      : label == 'Stock on hand' && unit != null
+                          ? ' $unit'
+                          : null),
               validator: (value) =>
                   value == null ? 'This field is required' : null,
               onChanged: onChanged,
@@ -97,4 +102,17 @@ class FirebaseServices {
               textColor: Colors.white,
               onPressed: () =>
                   ScaffoldMessenger.of(context).clearSnackBars())));
+}
+
+class UpperCaseTextFormatter extends TextInputFormatter {
+  @override
+  TextEditingValue formatEditUpdate(
+    TextEditingValue oldValue,
+    TextEditingValue newValue,
+  ) {
+    return TextEditingValue(
+      text: newValue.text.toUpperCase(),
+      selection: newValue.selection,
+    );
+  }
 }
