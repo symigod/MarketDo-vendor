@@ -16,12 +16,12 @@ class PendingOrdersScreen extends StatefulWidget {
 }
 
 class _PendingOrdersScreenState extends State<PendingOrdersScreen> {
-  bool isPending = true;
+  bool isDelivered = false;
   @override
   Widget build(BuildContext context) => StreamBuilder(
       stream: ordersCollection
           .where('vendorID', isEqualTo: authID)
-          .where('isPending', isEqualTo: isPending)
+          .where('isDelivered', isEqualTo: isDelivered)
           .orderBy('orderedOn')
           .snapshots(),
       builder: (context, os) {
@@ -274,7 +274,8 @@ class _PendingOrdersScreenState extends State<PendingOrdersScreen> {
                                                               FontWeight.bold))
                                                 ])),
                                             subtitle: Text(product.description),
-                                            trailing: Text(  'P ${numberToString(payments)}',
+                                            trailing: Text(
+                                                'P ${numberToString(payments)}',
                                                 style: const TextStyle(
                                                     color: Colors.red,
                                                     fontWeight:
@@ -297,10 +298,10 @@ class _PendingOrdersScreenState extends State<PendingOrdersScreen> {
                           inactiveThumbColor: Colors.red,
                           inactiveTrackColor: Colors.red.shade300,
                           title: Text(
-                              order['isPending'] ? 'Pending' : 'Delivered'),
-                          value: !order['isPending'],
+                              order['isDelivered'] ? 'Pending' : 'Delivered'),
+                          value: !order['isDelivered'],
                           onChanged: (newValue) {
-                            setState(() => isPending = !newValue);
+                            setState(() => isDelivered = !newValue);
                             updateOrderStatus(order['orderID'], !newValue);
                           })
                     ]);
@@ -432,9 +433,18 @@ class _PendingOrdersScreenState extends State<PendingOrdersScreen> {
             }
             return emptyWidget('VENDOR NOT FOUND');
           }));
-  updateOrderStatus(String orderID, bool isPending) =>
-      ordersCollection.doc(orderID).update({'isPending': isPending}).catchError(
-          (error) => print('Failed to update order status: $error'));
+  updateOrderStatus(String orderID, bool isDelivered) => showDialog(
+      context: context,
+      builder: (_) => confirmDialog(
+          context,
+          'Order Delivered',
+          'This order will be set as delivered. Once delivered, you cannot undo this. Do you want to continue?',
+          () => ordersCollection
+              .doc(orderID)
+              .update({'isDelivered': isDelivered})
+              .then((value) => Navigator.pop(context))
+              .catchError(
+                  (error) => print('Failed to update order status: $error'))));
 
   blockCustomer(context, String customerID) => showDialog(
       context: context,

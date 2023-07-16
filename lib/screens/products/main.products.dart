@@ -1,71 +1,55 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:marketdo_app_vendor/firebase.services.dart';
-import 'package:marketdo_app_vendor/models/product.model.dart';
-import 'package:marketdo_app_vendor/screens/products/details.product.dart';
-import 'package:marketdo_app_vendor/widget/snapshots.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:marketdo_app_vendor/screens/categories/clothing.dart';
+import 'package:marketdo_app_vendor/screens/categories/food.dart';
+import 'package:marketdo_app_vendor/screens/categories/household.dart';
+import 'package:marketdo_app_vendor/screens/categories/others.dart';
+import 'package:marketdo_app_vendor/screens/categories/personalcare.dart';
+import 'package:marketdo_app_vendor/screens/categories/school.office.dart';
 
-class ProductScreen extends StatelessWidget {
-  static const String id = 'product-screen';
-  const ProductScreen({super.key});
+class ProductsScreen extends StatefulWidget {
+  const ProductsScreen({super.key});
 
   @override
-  Widget build(BuildContext context) => Scaffold(
-      appBar: AppBar(
-          backgroundColor: Colors.transparent, elevation: 0, toolbarHeight: 0),
-      body: StreamBuilder(
-          stream: productsCollection
-              .where('vendorID', isEqualTo: authID)
-              .orderBy('productName')
-              .snapshots(),
-          builder: ((context, snapshot) {
-            if (snapshot.hasError) {
-              return errorWidget(snapshot.error.toString());
-            }
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return loadingWidget();
-            }
-            if (snapshot.data!.docs.isNotEmpty) {
-              return GridView.builder(
-                  shrinkWrap: true,
-                  physics: const ScrollPhysics(),
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 3, childAspectRatio: 1 / 1.4),
-                  itemCount: snapshot.data!.docs.length,
-                  itemBuilder: (context, index) {
-                    List<ProductModel> productModel = snapshot.data!.docs
-                        .map((doc) => ProductModel.fromFirestore(doc))
-                        .toList();
-                    var product = productModel[index];
-                    return Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: InkWell(
-                            onTap: () => Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (_) => ProductDetailScreen(
-                                        productID: product.productID))),
-                            child: Container(
-                                padding: const EdgeInsets.all(8),
-                                height: 80,
-                                width: 80,
-                                child: Column(children: [
-                                  ClipRRect(
-                                      borderRadius: BorderRadius.circular(4),
-                                      child: SizedBox(
-                                          height: 90,
-                                          width: 90,
-                                          child: CachedNetworkImage(
-                                              imageUrl: product.imageURL,
-                                              fit: BoxFit.cover))),
-                                  const SizedBox(height: 5),
-                                  Text(product.productName,
-                                      textAlign: TextAlign.center,
-                                      style: const TextStyle(fontSize: 10),
-                                      maxLines: 2)
-                                ]))));
-                  });
-            }
-            return emptyWidget('NO PUBLISHED PRODUCTS');
-          })));
+  State<ProductsScreen> createState() => _ProductsScreenState();
+}
+
+class _ProductsScreenState extends State<ProductsScreen>
+    with SingleTickerProviderStateMixin {
+  late TabController tabController;
+
+  @override
+  void initState() {
+    super.initState();
+    tabController = TabController(length: 6, vsync: this);
+  }
+
+  @override
+  Widget build(BuildContext context) => DefaultTabController(
+      length: 6,
+      child: Scaffold(
+          appBar: AppBar(
+              toolbarHeight: 0,
+              bottom: TabBar(
+                  controller: tabController,
+                  isScrollable: true,
+                  unselectedLabelColor: Colors.grey,
+                  indicatorColor: Colors.yellow,
+                  indicatorWeight: 3,
+                  tabs: const [
+                    Tab(icon: FaIcon(FontAwesomeIcons.shirt)),
+                    Tab(icon: FaIcon(FontAwesomeIcons.utensils)),
+                    Tab(icon: FaIcon(FontAwesomeIcons.couch)),
+                    Tab(icon: FaIcon(FontAwesomeIcons.handSparkles)),
+                    Tab(icon: FaIcon(FontAwesomeIcons.folderOpen)),
+                    Tab(icon: FaIcon(FontAwesomeIcons.ellipsis))
+                  ])),
+          body: TabBarView(controller: tabController, children: const [
+            ClothingAndAccessories(),
+            FoodAndBeverages(),
+            HouseholdItems(),
+            PersonalCare(),
+            SchoolAndOfficeSupplies(),
+            Others()
+          ])));
 }

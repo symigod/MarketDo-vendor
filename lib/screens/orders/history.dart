@@ -16,12 +16,12 @@ class OrderHistoryScreen extends StatefulWidget {
 }
 
 class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
-  bool isPending = false;
+  bool isDelivered = true;
   @override
   Widget build(BuildContext context) => StreamBuilder(
       stream: ordersCollection
           .where('vendorID', isEqualTo: authID)
-          .where('isPending', isEqualTo: isPending)
+          .where('isDelivered', isEqualTo: isDelivered)
           .orderBy('orderedOn')
           .snapshots(),
       builder: (context, os) {
@@ -301,7 +301,7 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
                               order['isPending'] ? 'Pending' : 'Delivered'),
                           value: !order['isPending'],
                           onChanged: (newValue) {
-                            setState(() => isPending = !newValue);
+                            setState(() => isDelivered = !newValue);
                             updateOrderStatus(order['orderID'], !newValue);
                           })
                     ]);

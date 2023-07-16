@@ -31,7 +31,7 @@ class _MainScreenState extends State<MainScreen> {
   }
 
   List<Widget> screens = const [
-    ProductScreen(),
+    ProductsScreen(),
     CategoryScreen(),
     OrderScreen(),
     BlockedScreen()

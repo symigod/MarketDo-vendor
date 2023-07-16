@@ -5,12 +5,9 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:marketdo_app_vendor/firebase.services.dart';
-import 'package:marketdo_app_vendor/screens/products/add.product.dart';
-import 'package:marketdo_app_vendor/screens/home.dart';
+import 'package:marketdo_app_vendor/screens/main.screen.dart';
 import 'package:marketdo_app_vendor/screens/authentication/login.dart';
-import 'package:marketdo_app_vendor/screens/products/main.products.dart';
 import 'package:marketdo_app_vendor/widget/dialogs.dart';
-import 'screens/orders/main.orders.dart';
 
 String appVersion = dateTimeToString(Timestamp.now());
 
@@ -90,10 +87,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
           builder: EasyLoading.init(),
           routes: {
             LoginScreen.id: (context) => const LoginScreen(),
-            HomeScreen.id: (context) => const HomeScreen(),
-            ProductScreen.id: (context) => const ProductScreen(),
-            AddProductScreen.id: (context) => const AddProductScreen(),
-            OrderScreen.id: (context) => const OrderScreen()
+            MainScreen.id: (context) => const MainScreen(),
           });
 }
 
