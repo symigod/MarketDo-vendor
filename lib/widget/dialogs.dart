@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -29,7 +30,9 @@ Widget successDialog(BuildContext context, String message) =>
 String dateTimeToString(Timestamp timestamp) =>
     DateFormat('MMM dd, yyyy').format(timestamp.toDate()).toString();
 
-String numberToString(double number) => NumberFormat('#,###.00').format(number);
+String numberToString(double number) => number < 1
+    ? NumberFormat('0.00').format(number)
+    : NumberFormat('#,###.00').format(number);
 
 String unitAbbreviation(String? selectedValue) {
   RegExp regex = RegExp(r'\((.*?)\)');
@@ -55,4 +58,33 @@ Future<void> openURL(context, String url) async {
         context: context,
         builder: (_) => errorDialog(context, 'Cannot open "$url"'));
   }
+}
+
+FaIcon categoryIcon(category) {
+  switch (category) {
+    case 'Clothing and Accessories':
+      category = FontAwesomeIcons.shirt;
+      break;
+
+    case 'Food and Beverages':
+      category = FontAwesomeIcons.utensils;
+      break;
+
+    case 'Household Items':
+      category = FontAwesomeIcons.couch;
+      break;
+
+    case 'Personal Care':
+      category = FontAwesomeIcons.handSparkles;
+      break;
+
+    case 'School and Office Supplies':
+      category = FontAwesomeIcons.folderOpen;
+      break;
+
+    case 'Others':
+      category = FontAwesomeIcons.ellipsis;
+      break;
+  }
+  return FaIcon(category);
 }

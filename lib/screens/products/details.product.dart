@@ -16,7 +16,11 @@ class ProductDetailScreen extends StatefulWidget {
 class _ProductDetailScreenState extends State<ProductDetailScreen> {
   @override
   Widget build(BuildContext context) => Scaffold(
-      appBar: AppBar(elevation: 0, title: const Text('Product Details')),
+      appBar: AppBar(
+          elevation: 0,
+          centerTitle: true,
+          title: const Text('Product Details',
+              style: TextStyle(fontWeight: FontWeight.bold))),
       body: SafeArea(
           child: StreamBuilder(
               stream: productsCollection
@@ -55,14 +59,10 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                           ListTile(
                               dense: true,
                               leading: const Icon(Icons.info),
-                              title: Text(product.productName),
-                              subtitle: Text(product.description)),
-                          const Divider(height: 0, thickness: 1),
-                          ListTile(
-                              dense: true,
-                              leading: const Icon(Icons.category),
-                              title: Text(product.category),
-                              subtitle: Text(product.subcategory),
+                              title: Text(product.productName,
+                                  style: const TextStyle(
+                                      fontWeight: FontWeight.bold)),
+                              subtitle: Text(product.description),
                               trailing: Row(
                                   mainAxisSize: MainAxisSize.min,
                                   children: [
@@ -71,8 +71,9 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                                     const SizedBox(width: 5),
                                     StreamBuilder(
                                         stream: favoritesCollection
-                                            .where('productID',
-                                                isEqualTo: product.productID)
+                                            .where('productIDs',
+                                                arrayContains:
+                                                    product.productID)
                                             .snapshots(),
                                         builder: (context, fs) {
                                           const count = Text('0',
@@ -98,21 +99,18 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                           const Divider(height: 0, thickness: 1),
                           ListTile(
                               dense: true,
+                              leading: const Icon(Icons.category),
+                              title: Text(product.category),
+                              subtitle: Text(product.subcategory),
+                              trailing: categoryIcon(product.category)),
+                          const Divider(height: 0, thickness: 1),
+                          ListTile(
+                              dense: true,
                               leading: const Icon(Icons.payments),
                               title:
                                   Text('Regular Price (per ${product.unit})'),
                               trailing: Text(
-                                       'P ${numberToString(product.regularPrice.toDouble())}',
-                                  style: const TextStyle(
-                                      color: Colors.red,
-                                      fontWeight: FontWeight.bold))),
-                          const Divider(height: 0, thickness: 1),
-                          ListTile(
-                              dense: true,
-                              leading: const Icon(Icons.delivery_dining),
-                              title: const Text('Delivery Fee'),
-                              trailing: Text(
-                                'P ${numberToString(product.shippingCharge.toDouble())}',
+                                  'P ${numberToString(product.regularPrice.toDouble())}',
                                   style: const TextStyle(
                                       color: Colors.red,
                                       fontWeight: FontWeight.bold))),

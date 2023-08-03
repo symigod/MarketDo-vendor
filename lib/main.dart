@@ -7,7 +7,7 @@ import 'package:marketdo_app_vendor/firebase.services.dart';
 import 'package:marketdo_app_vendor/screens/main.screen.dart';
 import 'package:marketdo_app_vendor/screens/authentication/login.dart';
 
-String appVersion = 'Jul 17, 2024';
+String appVersion = 'Aug 02, 2023';
 
 int marketDoGreen = 0xFF1B5E20;
 MaterialColor _marketDoGreen = MaterialColor(marketDoGreen, {

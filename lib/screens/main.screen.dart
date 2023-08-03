@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:marketdo_app_vendor/firebase.services.dart';
 import 'package:marketdo_app_vendor/main.dart';
 import 'package:marketdo_app_vendor/screens/blocked.dart';
-import 'package:marketdo_app_vendor/screens/categories.dart';
 import 'package:marketdo_app_vendor/screens/products/add.product.dart';
 import 'package:marketdo_app_vendor/screens/orders/main.orders.dart';
 import 'package:marketdo_app_vendor/screens/products/main.products.dart';
@@ -32,7 +31,7 @@ class _MainScreenState extends State<MainScreen> {
 
   List<Widget> screens = const [
     ProductsScreen(),
-    CategoryScreen(),
+    // CategoryScreen(),
     OrderScreen(),
     BlockedScreen()
   ];
@@ -104,16 +103,17 @@ class _MainScreenState extends State<MainScreen> {
                           items: [
                             const BottomNavigationBarItem(
                                 icon: Icon(Icons.store), label: 'My Products'),
-                            const BottomNavigationBarItem(
-                                icon: Icon(Icons.category),
-                                label: 'Categories'),
+                            // const BottomNavigationBarItem(
+                            //     icon: Icon(Icons.category),
+                            //     label: 'Categories'),
                             BottomNavigationBarItem(
                                 icon: Stack(children: [
                                   const Icon(Icons.shopping_bag),
                                   StreamBuilder(
                                       stream: ordersCollection
                                           .where('vendorID', isEqualTo: authID)
-                                          .where('isPending', isEqualTo: true)
+                                          .where('isDelivered',
+                                              isEqualTo: false)
                                           .snapshots(),
                                       builder: (context, os) {
                                         if (os.hasError) {
