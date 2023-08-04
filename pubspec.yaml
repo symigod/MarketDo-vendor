@@ -31,6 +31,8 @@ dependencies:
   tab_indicator_styler: ^2.0.0
   url_launcher: ^6.1.11
   font_awesome_flutter: ^10.5.0
+  pdf: ^3.10.4
+  printing: ^5.11.0
   
 
 dev_dependencies:
@@ -71,6 +73,9 @@ flutter:
     - family: Lato
       fonts:
         - asset: assets/fonts/Lato-Regular.ttf
+    - family: RobotoMono
+      fonts:
+        - asset: assets/fonts/RobotoMono-VariableFont_wght.ttf
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/custom-fonts/#from-packages
